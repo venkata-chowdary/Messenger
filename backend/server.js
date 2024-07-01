@@ -1,22 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
-const chatRoutes=require('./routes/chatRoutes')
-const messageRoutes=require('./routes/messageRoutes')
-
-
-const {notFound,errorHandler}=require('./middleware/errorMiddleware')
-const {authMiddleware}=require('./middleware/authMiddleware')
-
+const chatRoutes = require('./routes/chatRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const { authMiddleware } = require('./middleware/authMiddleware');
 
 const app = express();
-const cors=require('cors')
+const cors = require('cors');
 app.use(express.json());
 app.use(cors());
 
 app.use('/api/user', userRoutes);
-app.use('/api/chat',chatRoutes);
-app.use('/api/message',messageRoutes)
+app.use('/api/chat', chatRoutes);
+app.use('/api/message', messageRoutes);
 
 const connectDB = async () => {
     try {
@@ -33,29 +30,51 @@ const connectDB = async () => {
 
 connectDB();
 
-app.get('/',(req,res)=>{
-    console.log(req)
-})
-
-app.get('/api/chat/:id', (req, res) => {
-    console.log("sjfns")
+app.get('/', (req, res) => {
+    console.log(req);
 });
 
-app.use(notFound)
-app.use(errorHandler)
+app.get('/api/chat/:id', (req, res) => {
+    console.log("sjfns");
+});
 
-const server=app.listen(4000, () => {
+app.use(notFound);
+app.use(errorHandler);
+
+const server = app.listen(4000, () => {
     console.log(`Server running on 4000`);
 });
 
-
-const io=require('socket.io')(server,{
-    pingTimeout:60000,
-    cors:{
-        origin:'http://localhost:3000'
+const io = require('socket.io')(server, {
+    pingTimeout: 60000,
+    cors: {
+        origin: 'http://localhost:3000'
     }
-})
+});
 
-io.on("connection",(socket)=>{
-    console.log("connected to socket")
-})
+io.on("connection", (socket) => {
+    console.log("connected to socket");
+
+    socket.on('setupSocket', (userData) => {
+        console.log(userData.name, userData._id)
+        socket.join(userData._id);
+        socket.emit('connected')
+    })
+
+    socket.on('join room', (roomId) => {
+        socket.join(roomId)
+        console.log("user joined room:", roomId)
+    })
+
+    socket.on('newMessage',(newMessageRecieved)=>{
+        var chat = newMessageRecieved.chat
+        if (!chat.users) return console.log('no users found in the chat')
+
+        chat.users.forEach(user => {
+            if (user._id.toString() == newMessageRecieved.sender._id) return
+            socket.to(user._id).emit('messageReceived', newMessageRecieved)
+            console.log("message sent")
+        })
+    })
+
+});

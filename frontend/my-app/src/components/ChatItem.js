@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import '../styles/ContactList.css';
 import axios from 'axios';
-import { config } from '@fortawesome/fontawesome-svg-core';
 import { UserContext } from '../context/UserContext';
 
 function ChatItem(props) {
@@ -29,8 +28,6 @@ function ChatItem(props) {
                 console.log(err)
             })
     }, [])
-
-    console.log(chatDetails)
 
     return (
         <div key={props._id} className="chat-item" onClick={() => props.onChatClick(props._id)}>

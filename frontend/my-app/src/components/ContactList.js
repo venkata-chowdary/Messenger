@@ -8,6 +8,7 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import AddUser from "./AddUser";
 
 function ContactList(props) {
+    
     const [contactList, setContactList] = useState([]);
     const { userDetails } = useContext(UserContext);
     const [searchQuery, setSearchQuery] = useState('')
@@ -35,7 +36,6 @@ function ContactList(props) {
                     return allUsers;
                 }, []);
                 setContactList(users);
-                console.log(contactList)
             })
             .catch((err) => {
                 console.log('Error fetching chats:', err);
