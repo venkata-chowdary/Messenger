@@ -8,12 +8,12 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import AddUser from "./AddUser";
 
 function ContactList(props) {
-    
+    console.log(props)
     const [contactList, setContactList] = useState([]);
     const { userDetails } = useContext(UserContext);
     const [searchQuery, setSearchQuery] = useState('')
     const [usersListUpdated,setUsersListUpdate]=useState(false)
-
+    const [loading,setLoading]=useState(true)
 
     const config = {
         headers: {
@@ -24,6 +24,7 @@ function ContactList(props) {
 
     //Chat List GET - /api/chat
     useEffect(() => {
+        setLoading(true)
         axios.get('http://localhost:4000/api/chat', config)
             .then((response) => {
                 const chatData = response.data
@@ -36,11 +37,12 @@ function ContactList(props) {
                     return allUsers;
                 }, []);
                 setContactList(users);
+                setLoading(false)
             })
             .catch((err) => {
                 console.log('Error fetching chats:', err);
             });
-    }, [userDetails.token, userDetails._id,usersListUpdated]);
+    }, [userDetails.token, userDetails._id,usersListUpdated,props.UserIdToselectedChat]);
 
 
     const searchedChats = contactList.filter(user =>
@@ -61,7 +63,8 @@ function ContactList(props) {
                     value={searchQuery}
                 />
             </div>
-            <div className="chats">
+            {loading ?<p>loading...</p>:
+                <div className="chats">
                 {searchedChats.map(user => (
                     <ChatItem
                         key={user._id}
@@ -72,6 +75,8 @@ function ContactList(props) {
                     />
                 ))}
             </div>
+            }
+
         </div>
     );
 }

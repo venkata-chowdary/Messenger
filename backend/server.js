@@ -56,25 +56,38 @@ io.on("connection", (socket) => {
     console.log("connected to socket");
 
     socket.on('setupSocket', (userData) => {
-        console.log(userData.name, userData._id)
+        // console.log(userData.name, userData._id)
         socket.join(userData._id);
         socket.emit('connected')
     })
 
     socket.on('join room', (roomId) => {
         socket.join(roomId)
-        console.log("user joined room:", roomId)
+        // console.log("user joined room:", roomId)
     })
 
-    socket.on('newMessage',(newMessageRecieved)=>{
+    socket.on("typing", (roomId) => {
+        socket.to(roomId).emit('typing')
+    })
+
+    socket.on("stop typing",(roomId)=>{
+        socket.to(roomId).emit("stop typing")
+    })
+
+    socket.on('newMessage', (newMessageRecieved) => {
         var chat = newMessageRecieved.chat
         if (!chat.users) return console.log('no users found in the chat')
 
         chat.users.forEach(user => {
             if (user._id.toString() == newMessageRecieved.sender._id) return
             socket.to(user._id).emit('messageReceived', newMessageRecieved)
-            console.log("message sent")
+            // console.log("message sent")
         })
+    })
+
+
+    socket.off('setup',()=>{
+        console.log("disconnected from socket")
     })
 
 });

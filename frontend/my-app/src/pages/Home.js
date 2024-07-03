@@ -44,12 +44,11 @@ function Home() {
                 <div className='logo'>
                     <img src={logo} alt="logo" className='logo' />
                     <h1 className="title">Messenger</h1>
-                    <p>{userDetails.name}</p>
                 </div>
                 {userDetails && (
                     <div className="profile-section">
                         <div className="profile-info" onClick={toggleDropdown}>
-                            <img src={profile} alt="Profile" className="profile-image" />
+                            <img src={userDetails.profilePhoto} alt="Profile" className="profile-image" />
                         </div>
                         {showDropdown && (
                             <div className="dropdown-menu active" ref={dropdownRef}>
@@ -63,7 +62,7 @@ function Home() {
             </div>
             <div className="content">
                 <div className='sidebar'>
-                    <ContactList onChatClick={handleChatClick} />
+                    <ContactList onChatClick={handleChatClick} UserIdToselectedChat={UserIdToselectedChat} />
                 </div>
                 <div className='chat-window'>
                 <ChatWindow UserIdToselectedChat={UserIdToselectedChat} setSelectedChat={setSelectedChat}/>

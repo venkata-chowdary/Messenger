@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import {Navigate, useNavigate} from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import AuthPage from '../pages/AuthPage';
 import '../styles/Auth.css'
 import axios from 'axios'
@@ -11,11 +11,38 @@ function Signup() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [profilePic, setProfilePic] = useState()
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
+    const { setUserDetails } = useContext(UserContext)
 
-    const navigate=useNavigate()
-    const {setUserDetails}=useContext(UserContext)
-    
+    const postPhoto = (photo) => {
+        setLoading(true)
+        if (photo === undefined) {
+            console.log('please select an image')
+            return
+        }
 
+        if (photo.type === 'image/jpeg' || photo.type === 'image/png') {
+            const data = new FormData()
+            data.append('file', photo)
+            data.append('upload_preset', 'chat_app')
+            data.append('cloud_name', 'dxdfhiwlt')
+            axios.post('https://api.cloudinary.com/v1_1/dxdfhiwlt/image/upload', data)
+                .then((res) => {return res.data})
+                .then((data) => {
+                    console.log(data)
+                    setProfilePic(data.url.toString())
+                    setLoading(false)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
+        else {
+            console.log("Please select an image")
+        }
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -31,20 +58,21 @@ function Signup() {
             return;
         }
 
+        console.log(profilePic)
 
         axios.post('http://localhost:4000/api/user',
-            { name, password, email },
-            {headers: {'Content-Type': 'application/json'}})
-        .then((response)=>{
-            const data=response.data.data
-            console.log(data)
-            setUserDetails(data.data);
-            localStorage.setItem('userInfo',JSON.stringify(data))
-            navigate('/')
-        })
-        .catch((err)=>{
-            console.log(err)
-        })
+            { name, password, email,profilePic },
+            { headers: { 'Content-Type': 'application/json' } })
+            .then((response) => {
+                const data = response.data.data
+                console.log(data)
+                setUserDetails(data.data);
+                localStorage.setItem('userInfo', JSON.stringify(data))
+                navigate('/')
+            })
+            .catch((err) => {
+                console.log(err)
+            })
 
     };
 
@@ -81,8 +109,13 @@ function Signup() {
                         placeholder="Confirm Password"
                         required
                     />
+                    <input
+                        type='file'
+                        onChange={(e) => postPhoto(e.target.files[0])}
+                        accept='image/*'
+                    />
                     {error && <p className="error">{error}</p>}
-                    <button type="submit">Signup</button>
+                    {loading ? <p>Wait Photo iss uplaoding</p> : <button type="submit">Signup</button>}
                 </form>
             </div>
         </AuthPage>

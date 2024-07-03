@@ -1,4 +1,5 @@
 const Chat = require("../models/chatModel");
+const Message = require("../models/messageModel");
 const User = require('../models/userModel')
 const mongoose = require('mongoose')
 
@@ -9,7 +10,7 @@ const accessChat = async (req, res) => {
     if (!userId) {
         console.log("UserId param not sent with request");
         return res.sendStatus(400);
-        
+
     }
 
     try {
@@ -56,6 +57,8 @@ const fetchChats = async (req, res) => {
         .populate("users", "-password")
         .populate("latestMessage")
         .sort({ updatedAt: -1 })
+
+
         .then(async (results) => {
             results = await User.populate(results, {
                 path: "latestMessage.sender",
@@ -66,26 +69,57 @@ const fetchChats = async (req, res) => {
         .catch((err) => {
             console.log(err)
         })
-
 }
 
 // DELETE - /api/chat/deletechat
 
 const deleteChat = (req, res) => {
     const chatToDelete = req.params.chatId;
-
-    Chat.findByIdAndDelete(chatToDelete)
+    Message.deleteMany({ chat: chatToDelete })
+        .then((response) => {
+            console.log(response)
+            if (response.deletedCount === 0) {
+                return res.status(400).json({ message: "No messages found to delete." })
+            }
+            return Chat.findByIdAndDelete(chatToDelete)
+        })
         .then((response) => {
             if (!response) {
                 return res.status(404).json({ message: "Chat not found" });
             }
             console.log(response);
-            res.status(200).json({ message: "Chat Deleted" });
+            res.status(200).json({ message: "Chat and related messages deleted" });
         })
         .catch((err) => {
-            console.error(err);
-            res.status(500).json({ error: "Internal Server Error" });
-        });
+            console.log(err)
+        })
 }
 
-module.exports = { accessChat, fetchChats, deleteChat }
+const markMessageAsRead = async (req, res) => {
+    const { chatId } = req.params
+    Message.updateMany(
+        { chat: chatId, readBy: { $ne: req.user._id } },
+        { $push: { readBy: req.user._id } })
+
+        .then((response) => {
+            res.status(200).json({ message: "Messages marked as read" });
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+}
+
+
+const getUnreadMessageCount = (req, res) => {
+    const { chatId } = req.params
+    Message.find({ chat: chatId, readBy: { $ne: req.user._id } })
+        .then((response) => {
+            const unreadCount=response.length
+            console.log(unreadCount)
+            res.status(200).json({unreadCount})
+        })
+        .catch((err) => {
+            res.status(500).json({ message: error.message });
+        })
+}
+module.exports = { accessChat, fetchChats, deleteChat, markMessageAsRead, getUnreadMessageCount }

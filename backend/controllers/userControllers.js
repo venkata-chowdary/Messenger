@@ -6,18 +6,18 @@ const bcrypt = require('bcryptjs')
 
 
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body
-
+    const { name, email, password, profilePic } = req.body
+    console.log("photo", profilePic)
     if (!name || !email || !password) {
         res.status(400).json({ message: 'Enter All Fields' })
     }
 
     const userExists = await User.findOne({ email })
     if (userExists) {
-        res.send(400).json({ message: 'User already exsists' })
+        return res.send(400).json({ message: 'User already exsists' })
     }
 
-    const user = await User.create({ name, email, password })
+    const user = await User.create({ name, email, password, profilePhoto: profilePic })
     if (user) {
         return res.status(201).json({
             message: 'User created successfully',
@@ -46,6 +46,7 @@ const authUser = async (req, res) => {
                 name: user.name,
                 _id: user._id,
                 email: user.email,
+                about: user.about,
                 profilePhoto: user.profilePhoto,
                 token: generateToken(user._id)
             }
@@ -89,4 +90,39 @@ const searchUser = async (req, res) => {
             res.status(400).json({ message: "Failed to fetch users" })
         })
 }
-module.exports = { registerUser, authUser, allUsers,searchUser };
+
+
+const updateUserName = async (req, res) => {
+    const newName = req.body.newName
+    User.findByIdAndUpdate(req.user._id, { name: newName }, { new: true })
+        .then((updatedData) => {
+            res.status(200).json(updatedData)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+}
+
+const updateAbout=(req,res)=>{
+    const newAbout = req.body.newAbout
+    User.findByIdAndUpdate(req.user._id,{about:newAbout},{new:true})
+    .then((updatedData)=>{
+        res.status(200).json(updatedData)
+    })
+    .catch((err)=>{
+        console.log(err)
+    })
+}
+
+const updateProfilePicture = (req, res) => {
+    const newProfilePhoto=req.body.newProfilePic
+    User.findByIdAndUpdate(req.user._id, { profilePhoto:newProfilePhoto  }, { new: true })
+        .then((updatedData) => {
+            console.log(updatedData)
+            res.status(200).json(updatedData)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+}
+module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture,updateAbout };

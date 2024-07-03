@@ -1,0 +1,164 @@
+.profile-container {
+    background-color: #1c1c1c;
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 480px;
+    margin: 50px auto;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.profile-header a {
+    border: 0;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    padding: 0;
+    margin-right: 18px;
+    cursor: pointer;
+}
+
+.profile-header h2 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 60%;
+}
+
+.profile-details {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.profile-picture {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    /* overflow: hidden; */
+}
+
+.profile-picture img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.edit-icon {
+    position: absolute;
+    bottom: 0;
+    right: 15px;
+    background-color: #007bff;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-icon input[type="file"] {
+    display: none;
+}
+
+.profile-details span {
+    font-size: 12px;
+    margin-left: 4px;
+    color: #007bff;
+    font-weight: 400;
+    text-transform: uppercase;
+    display: block;
+    margin: 0;
+}
+
+.profile-details .user-name {
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 0;
+}
+
+.profile-details p {
+    font-size: 16px;
+    margin: 0;
+}
+
+.edit-mode {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.edit-mode input {
+    flex: 1;
+    height: 32px;
+    padding: 8px 0;
+    font-size: 16px;
+    border: 0;
+    border-bottom: 2px solid #007bff;
+    background: transparent;
+    /* border-radius: 4px; */
+    margin-right: 10px;
+    color: #fff;
+    height: 24px;
+}
+
+.edit-mode input:focus {
+    outline: none;
+}
+
+.edit-mode button {
+    border: 0;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-mode button:hover {
+    background-color: #0056b3;
+}
+
+.view-mode {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.view-mode p {
+    font-size: 16px;
+    margin: 0;
+    padding: 8px 0;
+}
+
+.view-mode button {
+    border: 0;
+    background-color: transparent;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    padding: 12px 10px;
+    margin-left: auto; /* Aligns the button to the right */
+}
+
+.view-mode button:hover {
+    color: #0056b3;
+}
