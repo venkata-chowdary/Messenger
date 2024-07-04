@@ -91,7 +91,6 @@ const searchUser = async (req, res) => {
         })
 }
 
-
 const updateUserName = async (req, res) => {
     const newName = req.body.newName
     User.findByIdAndUpdate(req.user._id, { name: newName }, { new: true })
@@ -103,20 +102,20 @@ const updateUserName = async (req, res) => {
         })
 }
 
-const updateAbout=(req,res)=>{
+const updateAbout = (req, res) => {
     const newAbout = req.body.newAbout
-    User.findByIdAndUpdate(req.user._id,{about:newAbout},{new:true})
-    .then((updatedData)=>{
-        res.status(200).json(updatedData)
-    })
-    .catch((err)=>{
-        console.log(err)
-    })
+    User.findByIdAndUpdate(req.user._id, { about: newAbout }, { new: true })
+        .then((updatedData) => {
+            res.status(200).json(updatedData)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 }
 
 const updateProfilePicture = (req, res) => {
-    const newProfilePhoto=req.body.newProfilePic
-    User.findByIdAndUpdate(req.user._id, { profilePhoto:newProfilePhoto  }, { new: true })
+    const newProfilePhoto = req.body.newProfilePic
+    User.findByIdAndUpdate(req.user._id, { profilePhoto: newProfilePhoto }, { new: true })
         .then((updatedData) => {
             console.log(updatedData)
             res.status(200).json(updatedData)
@@ -125,4 +124,40 @@ const updateProfilePicture = (req, res) => {
             console.log(err)
         })
 }
-module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture,updateAbout };
+
+const updatePassword = (req, res) => {
+    const newPassword = req.body.newPassword
+    const oldPassword = req.body.oldPassword
+
+    console.log(newPassword,oldPassword)
+    User.findOne(req.user._id)
+        .then((userData) => {
+            if (!userData) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            bcrypt.compare(oldPassword, userData.password)
+                .then((status) => {
+                    if (!status) {
+                        return res.status(400).json({ message: "Old password is incorrect" })
+                    }
+                    console.log(status)
+                    bcrypt.genSalt(10)
+                        .then(salt => bcrypt.hash(newPassword, salt))
+                        .then((hashedPassword) => {
+                            User.findByIdAndUpdate(req.user._id, { password: hashedPassword }, { new: true })
+                                .then((updatedData) => {
+                                    res.status(200).json({message:'password updated successfully.'})
+                                })
+                                .catch((err) => {
+                                    console.log(err)
+                                })
+                        })
+                })
+                .catch((err) => {
+                    console.log(err)
+                    res.status(500).json({ message: "Server error" });
+                })
+        })
+}
+module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword };

@@ -1,17 +1,15 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-
 import axios from 'axios';
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
 
 function AddUser({ setUsersListUpdate, onChatClick }) {
-
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
     const { userDetails } = useContext(UserContext);
+    const addUserRef = useRef(null);
 
     const config = {
         headers: {
@@ -26,7 +24,7 @@ function AddUser({ setUsersListUpdate, onChatClick }) {
         if (query.length >= 2) {
             axios.get(`http://localhost:4000/api/user/search?searchName=${query}`, config)
                 .then(response => {
-                    console.log(response)
+                    console.log(response);
                     setSearchResults(response.data);
                 })
                 .catch(error => {
@@ -37,16 +35,17 @@ function AddUser({ setUsersListUpdate, onChatClick }) {
         }
     };
 
+
+
     const handleUserSelect = (userId) => {
         axios.post('http://localhost:4000/api/chat', { userId }, config)
             .then(data => {
                 console.log(data);
                 setUsersListUpdate(value => !value);
                 setSearchQuery('');
-                onChatClick(userId)
+                onChatClick(userId);
                 setSearchResults([]);
                 setIsVisible(false);
-
             })
             .catch(err => {
                 console.error('Error creating chat:', err);
@@ -57,30 +56,47 @@ function AddUser({ setUsersListUpdate, onChatClick }) {
         setIsVisible(!isVisible);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (addUserRef.current && !addUserRef.current.contains(event.target)) {
+                setIsVisible(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [addUserRef]);
+
     return (
-        <div className="new-chat">
+        <div className="new-chat" ref={addUserRef}>
             <button className="newchat-button" onClick={handleAddUserClick}>
                 <p>New Chat <FontAwesomeIcon icon={faPlus} /></p>
             </button>
             <div className={`search-container ${isVisible ? 'visible' : ''}`}>
-                <input
-                    type='text'
-                    placeholder='Search name or number'
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="search-input"
-                />
-                {searchResults.length > 0 && (
-                    <div className="recommendations">
-                        <ul>
-                            {searchResults.map(user => (
-                                <li key={user._id} onClick={() => handleUserSelect(user._id)}>
-                                    <img src={user.profilePhoto} alt={user.name} className="recommendation-profile-photo" />
-                                    <p>{user.name}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                {isVisible && (
+                    <>
+                        <input
+                            type='text'
+                            placeholder='Search name or number'
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="search-input"
+                        />
+                        {searchResults.length > 0 && (
+                            <div className="recommendations">
+                                <ul>
+                                    {searchResults.map(user => (
+                                        <li key={user._id} onClick={() => handleUserSelect(user._id)}>
+                                            <img src={user.profilePhoto} alt={user.name} className="recommendation-profile-photo" />
+                                            <p>{user.name}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

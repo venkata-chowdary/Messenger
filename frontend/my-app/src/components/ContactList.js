@@ -3,8 +3,6 @@ import axios from 'axios';
 import { UserContext } from "../context/UserContext";
 import '../styles/ContactList.css';
 import ChatItem from './ChatItem'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import AddUser from "./AddUser";
 
 function ContactList(props) {
@@ -12,8 +10,8 @@ function ContactList(props) {
     const [contactList, setContactList] = useState([]);
     const { userDetails } = useContext(UserContext);
     const [searchQuery, setSearchQuery] = useState('')
-    const [usersListUpdated,setUsersListUpdate]=useState(false)
-    const [loading,setLoading]=useState(true)
+    const [usersListUpdated, setUsersListUpdate] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const config = {
         headers: {
@@ -42,7 +40,7 @@ function ContactList(props) {
             .catch((err) => {
                 console.log('Error fetching chats:', err);
             });
-    }, [userDetails.token, userDetails._id,usersListUpdated,props.UserIdToselectedChat]);
+    }, [userDetails.token, userDetails._id, usersListUpdated, props.UserIdToselectedChat]);
 
 
     const searchedChats = contactList.filter(user =>
@@ -53,7 +51,7 @@ function ContactList(props) {
         <div className="contact-list">
             <div className="chats-heading">
                 <h2>Chats</h2>
-                <AddUser setUsersListUpdate={setUsersListUpdate} onChatClick={props.onChatClick}/>
+                <AddUser setUsersListUpdate={setUsersListUpdate} onChatClick={props.onChatClick} />
             </div>
             <div className="search-bar">
                 <input
@@ -63,19 +61,24 @@ function ContactList(props) {
                     value={searchQuery}
                 />
             </div>
-            {loading ?<p>loading...</p>:
-                <div className="chats">
-                {searchedChats.map(user => (
-                    <ChatItem
-                        key={user._id}
-                        _id={user._id}
-                        profilePhoto={user.profilePhoto}
-                        name={user.name}
-                        onChatClick={props.onChatClick}
-                    />
-                ))}
+            <div className="chats-list">
+                {loading ?
+                    <span className="contact-list-loader"></span>
+                    :
+                    <div className="chats">
+                        {searchedChats.map(user => (
+                            <ChatItem
+                                key={user._id}
+                                _id={user._id}
+                                profilePhoto={user.profilePhoto}
+                                name={user.name}
+                                onChatClick={props.onChatClick}
+                            />
+                        ))}
+                    </div>
+                }
             </div>
-            }
+
 
         </div>
     );

@@ -7,12 +7,15 @@
     margin: 50px auto;
     text-align: left;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    
 }
 
 .profile-header {
     display: flex;
     align-items: center;
-    margin-bottom: 18px;
 }
 
 .profile-header a {
@@ -41,6 +44,8 @@
     display: flex;
     gap: 20px;
     align-items: center;
+    margin: 10px 0;
+    height: 140px;
 }
 
 .profile-picture {
@@ -106,7 +111,7 @@
 .edit-mode input {
     flex: 1;
     height: 32px;
-    padding: 8px 0;
+    padding: 14px 0;
     font-size: 16px;
     border: 0;
     border-bottom: 2px solid #007bff;
@@ -154,6 +159,7 @@
     color: #007bff;
     cursor: pointer;
     font-size: 14px;
+    
     transition: color 0.3s ease;
     padding: 12px 10px;
     margin-left: auto; /* Aligns the button to the right */
@@ -161,4 +167,84 @@
 
 .view-mode button:hover {
     color: #0056b3;
+}
+
+.password-section{
+    margin: 10px 0 2px;
+}
+
+.password-section span{
+    margin: 6px 0 0 10px;
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+}
+
+.password-section p{
+    padding:0 0 6px 4px;
+}
+.password-handling-btns button {
+    border: 0;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    /* margin: 0 auto; */
+    min-width: 80px;
+    position: relative;
+}
+
+.password-handling-btns {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.password-handling-btns :hover {
+    background-color: #0056b3;
+}
+
+.password-inputs{
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.password-inputs input{
+    border: 0;
+    background-color: #3a3a3a;
+    padding: 10px 14px;
+    border-radius: 20px;
+    outline: none;
+    font-size: 16px;
+    width: 80%;
+    color: #fff;
+}
+
+
+/* Profile.css */
+.profile-loader {
+    width: 16px; 
+    height: 16px; /* Example size, adjust as needed */
+    border: 3px solid #FFF;
+    border-bottom-color: #007bff;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    position: relative;
+    top: 1.5px;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

@@ -4,7 +4,7 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faL, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faL, faTicket, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import io from 'socket.io-client'
 
 
@@ -20,11 +20,10 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
     const [socketConnection, setSocketConnection] = useState(false)
     const selectedChatCompare = useRef(null);
     const messagesEndRef = useRef(null)
-    const [loading,setLoading]=useState(false)
+    const [loading, setLoading] = useState(false)
     const [typing, setTyping] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
 
-    console.log(userDetails)
     const config = useMemo(() => ({
         headers: {
             "Content-type": "application/json",
@@ -47,6 +46,7 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
             axios.get(`http://localhost:4000/api/message/${chatDetails._id}`, config)
                 .then((response) => {
                     setMessages(response.data);
+                    console.log(response.data)
                     socket.emit("join room", chatDetails._id)
                     setLoading(false)
                 })
@@ -117,8 +117,8 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
                 console.log("message received")
                 setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
             }
-            else{
-                
+            else {
+
             }
         });
         return () => {
@@ -176,7 +176,13 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
                         {messages.map((message) => (
                             <div key={message._id} className={`message ${message.sender._id === userDetails._id ? 'current-user-message' : 'other-user-message'}`}>
                                 <p>{message.content}</p>
-                                <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                <div>
+                                    <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <div className={`read-by-ticks ${message.readBy.includes(userDetails._id) ? `blue-ticks` : null}`}>
+                                        <span className='tick-1'><FontAwesomeIcon icon={faCheck} /></span>
+                                        <span className='tick-2'><FontAwesomeIcon icon={faCheck} /></span>
+                                    </div>
+                                </div>
                             </div>))}
                         <div ref={messagesEndRef}></div>
                     </div>

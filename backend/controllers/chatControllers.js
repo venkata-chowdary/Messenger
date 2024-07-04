@@ -72,7 +72,6 @@ const fetchChats = async (req, res) => {
 }
 
 // DELETE - /api/chat/deletechat
-
 const deleteChat = (req, res) => {
     const chatToDelete = req.params.chatId;
     Message.deleteMany({ chat: chatToDelete })
