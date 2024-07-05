@@ -12,7 +12,7 @@ function Home() {
     const { userDetails, logout } = useContext(UserContext);
     const [showDropdown, setShowDropdown] = useState(false);
     const [UserIdToselectedChat, setSelectedChat] = useState(null)
-
+    console.log(userDetails)
     
     const dropdownRef = useRef(null);
 

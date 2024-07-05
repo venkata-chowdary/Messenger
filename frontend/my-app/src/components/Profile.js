@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPen, faCheck, faCamera, faCircleXmark, faCircleCheck, faL } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faPen, faCheck, faCamera, faCircleXmark, faCircleCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import axios from "axios";
 import { Link } from 'react-router-dom';
 import '../styles/Profile.css';
@@ -13,16 +13,18 @@ function Profile() {
     const [name, setName] = useState(userDetails.name);
     const [about, setAbout] = useState(userDetails.about ? userDetails.about : 'Available');
     const [loading, setLoading] = useState(false);
-    const [saveLoading, setSaveLoading] = useState(false)
+    const [saveLoading, setSaveLoading] = useState(false);
     const [profilePic, setProfilePic] = useState(userDetails.profilePhoto);
-    const [passwordSectionActive, setPasswordSectionActive] = useState(false)
-
-    const [passwordsMatch, setNewPasswordsMatch] = useState(false)
+    const [passwordSectionActive, setPasswordSectionActive] = useState(false);
+    const [passwordsMatch, setNewPasswordsMatch] = useState(false);
     const [passwordUpdated, setPasswordUpdated] = useState(false);
-
-    const [oldPassword, setOldPassword] = useState('')
-    const [newPassword, setNewPassword] = useState('')
-    const [confirmNewPassword, setConfirmNewPassword] = useState('')
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [otpVerified, setOtpVerified] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpInputs, setOtpInputs] = useState(['', '', '', '']);
+    const [passwordError, setPasswordError] = useState('');
 
     const config = {
         headers: {
@@ -49,7 +51,7 @@ function Profile() {
             })
             .catch((err) => {
                 console.log(err);
-            })
+            });
     };
 
     const handleAboutSave = () => {
@@ -61,8 +63,8 @@ function Profile() {
                 }
             })
             .catch((err) => {
-                console.log(err)
-            })
+                console.log(err);
+            });
     };
 
     const postPhoto = (photo) => {
@@ -80,15 +82,15 @@ function Profile() {
             axios.post('https://api.cloudinary.com/v1_1/dxdfhiwlt/image/upload', data)
                 .then((res) => res.data)
                 .then((data) => {
-                    console.log(data.url)
+                    console.log(data.url);
                     setProfilePic(data.url.toString());
                     axios.put(`http://localhost:4000/api/user/update-profile-picture`, { newProfilePic: data.url.toString() }, config)
                         .then((response) => {
                             if (response.status === 200) {
-                                console.log(response.data.profilePhoto)
-                                setUserDetails((prevDetails) => ({ ...prevDetails, profilePhoto: response.data.profilePhoto }))
+                                console.log(response.data.profilePhoto);
+                                setUserDetails((prevDetails) => ({ ...prevDetails, profilePhoto: response.data.profilePhoto }));
                             }
-                        })
+                        });
                     setLoading(false);
                 });
         } else {
@@ -104,69 +106,132 @@ function Profile() {
     };
 
     const handleChangePassword = () => {
-        setPasswordSectionActive(prev => !prev)
-    }
+        setPasswordSectionActive(prev => !prev);
+    };
 
     const handlePasswordCancel = () => {
-        setPasswordSectionActive(prev => !prev)
-    }
+        setPasswordSectionActive(prev => !prev);
+        resetPasswordFields();
+    };
+
+    const resetPasswordFields = () => {
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+        setOtpVerified(false);
+        setOtpSent(false);
+        setOtpInputs(['', '', '', '']);
+        setNewPasswordsMatch(false);
+        setPasswordError('');
+    };
 
     const handlePasswordSave = () => {
-        console.log(newPassword)
-        setSaveLoading(true)
 
-        // setTimeout(() => {
-        //     setConfirmNewPassword('')
-        //     setOldPassword('')
-        //     setNewPassword('')
+        if(newPassword=='' || confirmNewPassword=='' || oldPassword==''){
+            setPasswordError('Enter Password')
+            setSaveLoading(false)
+            return
+        }
 
-        //     setSaveLoading(false)
-        //     setNewPasswordsMatch(false)
 
-        //     setPasswordUpdated(true)
+        if (newPassword.length < 6) {
+            setPasswordError('Password must be at least 6 characters long.');
+            setSaveLoading(false);
+            return;
+        }
 
-        //     setTimeout(() => {
-        //         setPasswordUpdated(false);
-        //     }, 3000);
-        // }, 2000)
+        if (newPassword !== confirmNewPassword) {
+            setPasswordError('Passwords do not match.');
+            setSaveLoading(false);
+            return;
+        }
+
+        if (!otpVerified) {
+            setPasswordError('Please verify the OTP before saving.');
+            setSaveLoading(false);
+            return;
+        }
+
+
+
+        setSaveLoading(true);
         axios.put(`http://localhost:4000/api/user/update-password`, { newPassword, oldPassword }, config)
             .then((res) => {
-                console.log(res)
+                console.log(res);
                 if (res.status === 200) {
-                    setConfirmNewPassword('')
-                    setOldPassword('')
-                    setNewPassword('')
-
-                    setPasswordUpdated(true)
-                    setSaveLoading(false)
-                    setNewPasswordsMatch(false)
+                    resetPasswordFields();
+                    setPasswordUpdated(true);
+                    setSaveLoading(false);
                     setTimeout(() => {
                         setPasswordUpdated(false);
+                        setTimeout(() => setPasswordSectionActive(false), 1000)
                     }, 3000);
+
+
                 }
             })
             .catch((err) => {
-                console.log(err)
-            })
-    }
+                console.log(err);
+                setPasswordError('An error occurred while updating the password. Please try again.');
+                setSaveLoading(false);
+            });
+    };
 
-    function handleNewPassword(e) {
-        setNewPassword(e.target.value)
+    const handleNewPassword = (e) => {
+        setNewPassword(e.target.value);
         if ((e.target.value) === confirmNewPassword) {
             setNewPasswordsMatch(true);
+            setPasswordError('');
         } else {
             setNewPasswordsMatch(false);
         }
-    }
+    };
 
-    function handleConfirmPassword(e) {
-        setConfirmNewPassword(e.target.value)
+    const handleConfirmPassword = (e) => {
+        setConfirmNewPassword(e.target.value);
         if (newPassword === e.target.value) {
             setNewPasswordsMatch(true);
+            setPasswordError('');
         } else {
             setNewPasswordsMatch(false);
         }
-    }
+    };
+
+    const requestOtp = () => {
+        axios.get(`http://localhost:4000/api/user/generate-otp`, config)
+            .then((response) => {
+                if (response.status === 201) {
+                    setOtpSent(true);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const handleOtpInputChange = (index, value) => {
+        const newOtpInputs = [...otpInputs];
+        newOtpInputs[index] = value;
+        setOtpInputs(newOtpInputs);
+    };
+
+    const verifyOtp = () => {
+        const otpNumber = parseInt(otpInputs.join(''), 10);
+        console.log(otpNumber);
+        axios.post(`http://localhost:4000/api/user/verify-otp`, { otp: otpNumber }, config)
+            .then((response) => {
+                console.log(response);
+                if (response.status === 200) {
+                    setOtpVerified(true);
+                    setPasswordError('');
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                setPasswordError('Invalid OTP. Please try again.');
+            });
+    };
+
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -224,26 +289,52 @@ function Profile() {
                     <div className='password-section'>
                         <div className='password-inputs'>
                             <input type="password" placeholder="old password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
-                            <input type="password" placeholder="new password" value={newPassword} onChange={(e) => handleNewPassword(e)} />
-                            <input type="password" placeholder="confirm new password" value={confirmNewPassword} onChange={(e) => handleConfirmPassword(e)} />
+                            <input type="password" placeholder="new password" value={newPassword} onChange={handleNewPassword} />
+                            <input type="password" placeholder="confirm new password" value={confirmNewPassword} onChange={handleConfirmPassword} />
+                            {otpSent ? (
+                                !otpVerified ? (
+                                    <div className='otp-container'>
+                                        <div className="otp-input-container">
+                                            {otpInputs.map((value, index) => (
+                                                <input key={index} type="text" maxLength="1" className="otp-input" value={value} onChange={(e) => handleOtpInputChange(index, e.target.value)} />
+                                            ))}
+                                        </div>
+                                        <button onClick={verifyOtp} className='verify-otp-btn'>Verify OTP</button>
+                                    </div>
+                                ) : (
+                                    <span style={{ color: "#28a745" }}>
+                                        <FontAwesomeIcon icon={faCircleCheck} />
+                                        <p>OTP Verified.</p>
+                                    </span>
+                                )
+                            ) : (
+                                <button onClick={requestOtp} className='request-otp-btn'>Request OTP</button>
+                            )}
+                            {passwordError && (
+                                <div className="error-message">
+                                    <FontAwesomeIcon icon={faCircleXmark} className="error-icon" />
+                                    <p>{passwordError}</p>
+                                </div>
+                            )}
                         </div>
                         {
                             (newPassword === confirmNewPassword && confirmNewPassword !== '') ? (
                                 <span style={{ color: "#28a745" }}>
                                     <FontAwesomeIcon icon={faCircleCheck} />
-                                    <p>passwords match</p>
+                                    <p>Passwords match</p>
                                 </span>
                             ) : (
-                                !passwordsMatch && confirmNewPassword ? (
+                                confirmNewPassword && !passwordsMatch ? (
                                     <span>
-                                        <FontAwesomeIcon icon={faCircleXmark} />
-                                        <p>passwords do not match</p>
+                                        <FontAwesomeIcon icon={faXmarkCircle} />
+                                        <p>Passwords do not match</p>
                                     </span>
                                 ) : null
                             )
                         }
                     </div>
             }
+
             <div>
                 {passwordSectionActive ?
                     <div className='password-handling-btns'>

@@ -11,6 +11,9 @@ const cors = require('cors');
 app.use(express.json());
 app.use(cors());
 
+app.locals.OTP = null;
+app.locals.resetSession = false;
+
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);

@@ -29,7 +29,7 @@ function Signup() {
             data.append('upload_preset', 'chat_app')
             data.append('cloud_name', 'dxdfhiwlt')
             axios.post('https://api.cloudinary.com/v1_1/dxdfhiwlt/image/upload', data)
-                .then((res) => {return res.data})
+                .then((res) => { return res.data })
                 .then((data) => {
                     console.log(data)
                     setProfilePic(data.url.toString())
@@ -61,7 +61,7 @@ function Signup() {
         console.log(profilePic)
 
         axios.post('http://localhost:4000/api/user',
-            { name, password, email,profilePic },
+            { name, password, email, profilePic },
             { headers: { 'Content-Type': 'application/json' } })
             .then((response) => {
                 const data = response.data.data
@@ -72,6 +72,7 @@ function Signup() {
             })
             .catch((err) => {
                 console.log(err)
+                setError(err)
             })
 
     };
@@ -109,17 +110,28 @@ function Signup() {
                         placeholder="Confirm Password"
                         required
                     />
+                    <label htmlFor="file-upload" className="custom-file-upload">
+                        Upload Profile Picture
+                    </label>
                     <input
-                        type='file'
+                        id="file-upload"
+                        type="file"
                         onChange={(e) => postPhoto(e.target.files[0])}
-                        accept='image/*'
+                        accept="image/*"
                     />
+
                     {error && <p className="error">{error}</p>}
-                    {loading ? <p>Wait Photo iss uplaoding</p> : <button type="submit">Signup</button>}
+                    <button type="submit">
+                        {loading ?
+                            <span className='profile-loader'></span>
+                            : <p>Signup</p>
+                        }
+                    </button>
                 </form>
             </div>
         </AuthPage>
     );
 }
+
 
 export default Signup;

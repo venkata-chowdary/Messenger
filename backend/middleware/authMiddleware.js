@@ -2,8 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 
 const authMiddleware = async (req, res, next) => {
-    let token;
-
+    let token
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
         try {
             token = req.headers.authorization.split(" ")[1];
@@ -19,4 +18,14 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-module.exports = { authMiddleware };
+
+const localVariables = (req, res, next) => {
+    if (!req.app.locals) {
+        req.app.locals = {
+            OTP: null,
+            resetSession: false,
+        };
+    }
+    next();
+};
+module.exports = { authMiddleware,localVariables };

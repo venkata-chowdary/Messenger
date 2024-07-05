@@ -125,11 +125,13 @@ const updateProfilePicture = (req, res) => {
         })
 }
 
+
+
 const updatePassword = (req, res) => {
     const newPassword = req.body.newPassword
     const oldPassword = req.body.oldPassword
 
-    console.log(newPassword,oldPassword)
+    console.log(newPassword,oldPassword)    
     User.findOne(req.user._id)
         .then((userData) => {
             if (!userData) {

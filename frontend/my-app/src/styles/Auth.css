@@ -66,3 +66,25 @@
 .auth-form button:hover {
     background-color: #0056b3;
 }
+
+.auth-form input[type="file"] {
+    display: none;
+}
+
+label[for="file-upload"] {
+    display: inline-block;
+    padding: 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    background-color: #444;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 16px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+label[for="file-upload"]:hover {
+    background-color: #555;
+}
