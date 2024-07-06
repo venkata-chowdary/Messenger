@@ -221,12 +221,14 @@
     width: 80%;
     user-select: none;
     color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Add shadow */
 }
 
 .profile-loader {
-    width: 16px; 
-    height: 16px; /* Example size, adjust as needed */
+    width: 16px;
+    height: 16px;
+    /* Example size, adjust as needed */
     border: 3px solid #FFF;
     border-bottom-color: #007bff;
     border-radius: 50%;
@@ -241,6 +243,7 @@
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -275,7 +278,8 @@
     width: 40px;
     color: #fff;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Add shadow */
 }
 
 .otp-container {
@@ -288,17 +292,17 @@
     font-size: 13px;
 }
 
-.error-message{
+.error-message {
     display: flex;
-    margin-left:10px;
+    margin-left: 10px;
     color: #dc3545;
     font-size: 13px;
 }
 
 .password-section span {
-    margin-left:10px;
+    margin-left: 10px;
     color: #dc3545;
     display: flex;
     font-size: 13px;
-    margin-top:8px;
+    margin-top: 8px;
 }

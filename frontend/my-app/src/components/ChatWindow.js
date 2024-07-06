@@ -165,7 +165,6 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
                             </div>
 
                         </div>
-                        <p>{chatDetails._id}</p>
                         <div className='header-menu'>
                             <button className="delete-button" onClick={handleDelete} title="Delete">
                                 <FontAwesomeIcon icon={faTrashAlt} />

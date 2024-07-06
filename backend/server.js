@@ -21,6 +21,7 @@ app.use('/api/message', messageRoutes);
 const connectDB = async () => {
     try {
         await mongoose.connect(`mongodb+srv://chowdaryimmanni:s1aMQcASwCHVkwn8@cluster0.mh3yco8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
+        
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
@@ -40,6 +41,7 @@ app.get('/', (req, res) => {
 app.get('/api/chat/:id', (req, res) => {
     console.log("sjfns");
 });
+
 
 app.use(notFound);
 app.use(errorHandler);

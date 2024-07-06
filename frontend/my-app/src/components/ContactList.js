@@ -4,6 +4,7 @@ import { UserContext } from "../context/UserContext";
 import '../styles/ContactList.css';
 import ChatItem from './ChatItem'
 import AddUser from "./AddUser";
+import CreateGroup from "./CreateGroup";
 
 function ContactList(props) {
     console.log(props)
@@ -52,6 +53,7 @@ function ContactList(props) {
             <div className="chats-heading">
                 <h2>Chats</h2>
                 <AddUser setUsersListUpdate={setUsersListUpdate} onChatClick={props.onChatClick} />
+                <CreateGroup/>
             </div>
             <div className="search-bar">
                 <input

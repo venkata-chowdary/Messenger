@@ -3,9 +3,7 @@ const Message = require("../models/messageModel")
 const User = require("../models/userModel")
 
 const sendMessage = async (req, res) => {
-
     const { content, chatId } = req.body
-
     if (!content || !chatId) {
         console.log("Invalid Message request")
         return res.status(400).json({ message: "Invalid Message request" })
