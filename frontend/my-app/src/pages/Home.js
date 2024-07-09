@@ -12,6 +12,7 @@ function Home() {
     const { userDetails, logout } = useContext(UserContext);
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedChat, setSelectedChat] = useState(null)
+    const [usersListUpdated, setUsersListUpdate] = useState(false)
 
     const dropdownRef = useRef(null);
 
@@ -63,10 +64,10 @@ function Home() {
             </div>
             <div className="content">
                 <div className='sidebar'>
-                    <ContactList handleChatClick={handleChatClick}/>                    
+                    <ContactList handleChatClick={handleChatClick} usersListUpdated={usersListUpdated} setUsersListUpdate={setUsersListUpdate}/>                    
                 </div>
                 <div className='chat-window'>
-                    <ChatWindow selectedChat={selectedChat} setSelectedChat={setSelectedChat} />
+                    <ChatWindow selectedChat={selectedChat} setSelectedChat={setSelectedChat} setUsersListUpdate={setUsersListUpdate}/>
                 </div>
             </div>
         </div>

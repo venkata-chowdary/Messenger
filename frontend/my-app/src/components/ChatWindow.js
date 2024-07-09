@@ -11,7 +11,7 @@ import io from 'socket.io-client'
 const ENDPOINT = 'http://localhost:4000'
 let socket;
 
-function ChatWindow({ selectedChat, setSelectedChat, }) {
+function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate}) {
 
 
     const { userDetails } = useContext(UserContext);
@@ -85,6 +85,7 @@ function ChatWindow({ selectedChat, setSelectedChat, }) {
             .then((response) => {
                 if (response.status === 200) {
                     setSelectedChat(null);
+                    setUsersListUpdate(prev=> !prev)
                 }
             })
             .catch((err) => {

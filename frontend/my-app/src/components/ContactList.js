@@ -6,11 +6,10 @@ import ChatItem from './ChatItem'
 import AddUser from "./AddUser";
 import CreateGroup from "./CreateGroup";
 
-function ContactList({handleChatClick}) {
+function ContactList({handleChatClick,usersListUpdated, setUsersListUpdate}) {
     const [contactList, setContactList] = useState([]);
     const { userDetails } = useContext(UserContext);
     const [searchQuery, setSearchQuery] = useState('')
-    const [usersListUpdated, setUsersListUpdate] = useState(false)
     const [loading, setLoading] = useState(true)
 
     const config = {
