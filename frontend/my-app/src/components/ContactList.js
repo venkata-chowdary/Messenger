@@ -6,8 +6,7 @@ import ChatItem from './ChatItem'
 import AddUser from "./AddUser";
 import CreateGroup from "./CreateGroup";
 
-function ContactList(props) {
-    console.log(props)
+function ContactList({handleChatClick}) {
     const [contactList, setContactList] = useState([]);
     const { userDetails } = useContext(UserContext);
     const [searchQuery, setSearchQuery] = useState('')
@@ -41,7 +40,7 @@ function ContactList(props) {
             .catch((err) => {
                 console.log('Error fetching chats:', err);
             });
-    }, [userDetails.token, userDetails._id, usersListUpdated, props.UserIdToselectedChat]);
+    }, [userDetails.token, usersListUpdated]);
 
 
     const searchedChats = contactList.filter(user =>
@@ -52,8 +51,7 @@ function ContactList(props) {
         <div className="contact-list">
             <div className="chats-heading">
                 <h2>Chats</h2>
-                <AddUser setUsersListUpdate={setUsersListUpdate} onChatClick={props.onChatClick} />
-                <CreateGroup/>
+                <AddUser setUsersListUpdate={setUsersListUpdate} handleChatClick={handleChatClick}/>
             </div>
             <div className="search-bar">
                 <input
@@ -74,14 +72,12 @@ function ContactList(props) {
                                 _id={user._id}
                                 profilePhoto={user.profilePhoto}
                                 name={user.name}
-                                onChatClick={props.onChatClick}
+                                handleChatClick={handleChatClick}
                             />
                         ))}
                     </div>
                 }
             </div>
-
-
         </div>
     );
 }

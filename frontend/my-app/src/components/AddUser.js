@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useContext, useRef, useState, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
 
-function AddUser({ setUsersListUpdate, onChatClick }) {
+function AddUser({ setUsersListUpdate, handleChatClick }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
@@ -43,7 +43,7 @@ function AddUser({ setUsersListUpdate, onChatClick }) {
                 console.log(data);
                 setUsersListUpdate(value => !value);
                 setSearchQuery('');
-                onChatClick(userId);
+                handleChatClick(userId);
                 setSearchResults([]);
                 setIsVisible(false);
             })
@@ -51,6 +51,7 @@ function AddUser({ setUsersListUpdate, onChatClick }) {
                 console.error('Error creating chat:', err);
             });
     };
+    
 
     const handleAddUserClick = () => {
         setIsVisible(!isVisible);

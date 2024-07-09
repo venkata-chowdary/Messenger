@@ -37,8 +37,8 @@ const sendMessage = async (req, res) => {
 const allMessages = async (req, res) => {
     const {chatId}=req.params
     try {
-        const messages = await Message.find({chat:chatId}).populate('sender', 'name pic email').populate('chat')
-        res.json(messages)
+        const messages = await Message.find({chat:chatId}).populate('sender', 'name pic email')
+        res.status(200).json(messages)
     }
     catch (err) {
         console.log(err)

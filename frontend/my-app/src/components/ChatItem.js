@@ -3,10 +3,10 @@ import '../styles/ContactList.css';
 import axios from 'axios';
 import { UserContext } from '../context/UserContext';
 
-function ChatItem(props) {
+function ChatItem({_id,profilePhoto,name,handleChatClick}) {
 
     
-    const otherUserId = props._id
+    const otherUserId = _id
     const [chatDetails, setChatDetails] = useState({})
     const { userDetails } = useContext(UserContext)
     const [unreadCount, setUnreadCount] = useState(0)
@@ -35,7 +35,6 @@ function ChatItem(props) {
             axios.get(`http://localhost:4000/api/chat/${chatDetails._id}/unread`, config)
                 .then((response) => {
                     setUnreadCount(response.data.unreadCount)
-                    
                 })
                 .catch((err) => {
                     console.log(err);
@@ -44,8 +43,7 @@ function ChatItem(props) {
     }, [chatDetails]);
 
 
-    function handleChatClick(e) {
-        props.onChatClick(props._id)
+    function handleChatItemClick(e) {
         axios.post(`http://localhost:4000/api/chat/${chatDetails._id}/mark-as-read`, {}, config)
             .then((response) => {
                 console.log(response)
@@ -54,13 +52,15 @@ function ChatItem(props) {
             .catch((err) => {
                 console.log(err)
             })
+        handleChatClick(chatDetails._id)
+
     }
 
     return (
-        <div key={props._id} className="chat-item" onClick={handleChatClick}>
-            <img src={props.profilePhoto} alt={props.name} className="chat-profile-photo" />
+        <div key={_id} className="chat-item" onClick={handleChatItemClick}>
+            <img src={profilePhoto} alt={name} className="chat-profile-photo" />
             <div className="chat-details">
-                <div className="chat-name">{props.name}</div>
+                <div className="chat-name">{name}</div>
                 <div className="chat-latest-message">
                     {chatDetails.latestMessage ?
                         chatDetails.latestMessage.content.length > 28 ?

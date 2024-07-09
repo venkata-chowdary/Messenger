@@ -11,9 +11,8 @@ import ChatWindow from '../components/ChatWindow';
 function Home() {
     const { userDetails, logout } = useContext(UserContext);
     const [showDropdown, setShowDropdown] = useState(false);
-    const [UserIdToselectedChat, setSelectedChat] = useState(null)
-    console.log(userDetails)
-    
+    const [selectedChat, setSelectedChat] = useState(null)
+
     const dropdownRef = useRef(null);
 
     const handleLogout = () => {
@@ -37,6 +36,7 @@ function Home() {
     }, []);
 
     function handleChatClick(_id) {
+        console.log(_id)
         setSelectedChat(_id)
     }
     return (
@@ -58,15 +58,15 @@ function Home() {
                             </div>
                         )}
                     </div>
-                    
+
                 )}
             </div>
             <div className="content">
                 <div className='sidebar'>
-                    <ContactList onChatClick={handleChatClick} UserIdToselectedChat={UserIdToselectedChat} />
+                    <ContactList handleChatClick={handleChatClick}/>                    
                 </div>
                 <div className='chat-window'>
-                <ChatWindow UserIdToselectedChat={UserIdToselectedChat} setSelectedChat={setSelectedChat}/>
+                    <ChatWindow selectedChat={selectedChat} setSelectedChat={setSelectedChat} />
                 </div>
             </div>
         </div>

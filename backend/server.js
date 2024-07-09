@@ -68,10 +68,11 @@ io.on("connection", (socket) => {
 
     socket.on('join room', (roomId) => {
         socket.join(roomId)
-        // console.log("user joined room:", roomId)
+        console.log("user joined room:", roomId)
     })
 
     socket.on("typing", (roomId) => {
+        console.log(roomId)
         socket.to(roomId).emit('typing')
     })
 

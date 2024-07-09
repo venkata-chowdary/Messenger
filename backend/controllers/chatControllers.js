@@ -71,6 +71,25 @@ const fetchChats = async (req, res) => {
         })
 }
 
+// GET - /api/chat/:chatId
+
+const loadChat=(req,res)=>{
+
+    const chatId=req.params.chatId
+
+    if(!chatId){
+        return res.status(400).send({message:"chatId is required."})
+    }
+
+    Chat.findById(chatId)
+    .populate("users","-password")
+    .then((response)=>{
+        res.status(200).json(response)
+    })
+    .catch((err)=>{
+        console.log(err)
+    })
+}
 // DELETE - /api/chat/deletechat
 const deleteChat = (req, res) => {
     const chatToDelete = req.params.chatId;
@@ -121,4 +140,4 @@ const getUnreadMessageCount = (req, res) => {
             res.status(500).json({ message: error.message });
         })
 }
-module.exports = { accessChat, fetchChats, deleteChat, markMessageAsRead, getUnreadMessageCount }
+module.exports = { accessChat, fetchChats, deleteChat, markMessageAsRead, getUnreadMessageCount,loadChat }

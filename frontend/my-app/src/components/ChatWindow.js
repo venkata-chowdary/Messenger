@@ -11,13 +11,20 @@ import io from 'socket.io-client'
 const ENDPOINT = 'http://localhost:4000'
 let socket;
 
-function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
+function ChatWindow({ selectedChat, setSelectedChat, }) {
+
+
     const { userDetails } = useContext(UserContext);
     const [otherUserDetails, setOtherUserDetails] = useState({});
     const [chatDetails, setChatDetails] = useState({});
+
+
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+
+
     const [socketConnection, setSocketConnection] = useState(false)
+
     const selectedChatCompare = useRef(null);
     const messagesEndRef = useRef(null)
     const [loading, setLoading] = useState(false)
@@ -31,6 +38,13 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
         }
     }), [userDetails.token]);
 
+    useEffect(() => {
+        if (selectedChat) {
+            fetchChat()
+        }
+    }, [selectedChat])
+
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
@@ -38,66 +52,6 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
     useEffect(() => {
         scrollToBottom()
     }, [messages]);
-
-    // get chat details GET - api/message/:id
-    useEffect(() => {
-        setLoading(true)
-        if (chatDetails._id) {
-            axios.get(`http://localhost:4000/api/message/${chatDetails._id}`, config)
-                .then((response) => {
-                    setMessages(response.data);
-                    console.log(response.data)
-                    socket.emit("join room", chatDetails._id)
-                    setLoading(false)
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    }, [chatDetails, config]);
-
-    function handleDelete() {
-        axios.delete(`http://localhost:4000/api/chat/${chatDetails._id}`, config)
-            .then((response) => {
-                if (response.status === 200) {
-                    setSelectedChat(null);
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
-
-    useEffect(() => {
-        if (UserIdToselectedChat) {
-            axios.post('http://localhost:4000/api/chat', { userId: UserIdToselectedChat }, config)
-                .then((response) => {
-                    const chatData = response.data;
-                    const otherUser = chatData.users.find((user) => user._id !== userDetails._id);
-                    setOtherUserDetails(otherUser);
-                    // console.log(chatData)
-                    selectedChatCompare.current = chatData._id
-                    setChatDetails(chatData);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    }, [UserIdToselectedChat]);
-
-    function handleSendMessage() {
-        if (newMessage.trim() === '') return;
-        socket.emit('stop typing', chatDetails._id)
-        axios.post('http://localhost:4000/api/message', { content: newMessage, chatId: chatDetails._id }, config)
-            .then((response) => {
-                setMessages([...messages, response.data]);
-                setNewMessage('');
-                socket.emit('newMessage', response.data)
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
 
     useEffect(() => {
         socket = io(ENDPOINT)
@@ -126,6 +80,32 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
         };
     }, [userDetails])
 
+    function handleDelete() {
+        axios.delete(`http://localhost:4000/api/chat/${chatDetails._id}`, config)
+            .then((response) => {
+                if (response.status === 200) {
+                    setSelectedChat(null);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    function handleSendMessage() {
+        if (newMessage.trim() === '') return;
+        socket.emit('stop typing', chatDetails._id)
+        axios.post('http://localhost:4000/api/message', { content: newMessage, chatId: chatDetails._id }, config)
+            .then((response) => {
+                setMessages([...messages, response.data]);
+                setNewMessage('');
+                socket.emit('newMessage', response.data)
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     function handleInputChange(e) {
         setNewMessage(e.target.value)
 
@@ -145,9 +125,60 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
             }
         }, 2000)
     }
+
+    function fetchChat() {
+        axios.get(`http://localhost:4000/api/chat/${selectedChat}`, config)
+            .then((response) => {
+                const chatData = response.data;
+                console.log(chatData)
+                setChatDetails(chatData)
+
+                // //Other User Details
+                const otherUser = chatData.users.find((user) => user._id !== userDetails._id);
+                setOtherUserDetails(otherUser)
+                selectedChatCompare.current = chatData._id
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
+    // get chat details GET - api/message/:id
+    useEffect(() => {
+        setLoading(true)
+        if (chatDetails._id) {
+            axios.get(`http://localhost:4000/api/message/${chatDetails._id}`, config)
+                .then((response) => {
+                    setMessages(response.data);
+                    socket.emit("join room", chatDetails._id)
+                    setLoading(false)
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    }, [chatDetails, config], selectedChat);
+
+    // function fetchMessages() {
+    //     setLoading(true)
+    //     if (chatDetails._id) {
+    //         console.log(chatDetails)
+    //         axios.get(`http://localhost:4000/api/message/${chatDetails._id}`, config)
+    //             .then((response) => {
+    //                 setMessages(response.data);
+    //                 socket.emit("join room", chatDetails._id)
+    //                 setLoading(false)
+    //                 console.log(response.data)
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err);
+    //             });
+    //     }
+    // }
+
     return (
         <div className="chat-window">
-            {UserIdToselectedChat && !loading ? (
+            {selectedChat ? (
                 <>
                     <div className="chat-header">
                         <div className="chat-header-info">
@@ -163,8 +194,8 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
                                     </div> : null}
                                 </span>
                             </div>
-
                         </div>
+                        <p>chat id:{selectedChat}</p>
                         <div className='header-menu'>
                             <button className="delete-button" onClick={handleDelete} title="Delete">
                                 <FontAwesomeIcon icon={faTrashAlt} />
@@ -172,18 +203,23 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
                         </div>
                     </div>
                     <div className="chat-messages">
-                        {messages.map((message) => (
-                            <div key={message._id} className={`message ${message.sender._id === userDetails._id ? 'current-user-message' : 'other-user-message'}`}>
-                                <p>{message.content}</p>
-                                <div>
-                                    <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                    <div className={`read-by-ticks ${message.readBy.includes(userDetails._id) ? `blue-ticks` : null}`}>
+                        {loading ? <span className='chat-window-loader'></span> :
+                            <>
+                                {messages.map((message) => (
+                                    <div key={message._id} className={`message ${message.sender._id === userDetails._id ? 'current-user-message' : 'other-user-message'}`}>
+                                        <p>{message.content}</p>
+                                        <div>
+                                            <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            {/* <div className={`read-by-ticks ${message.readBy.includes(userDetails._id) ? `blue-ticks` : null}`}>
                                         <span className='tick-1'><FontAwesomeIcon icon={faCheck} /></span>
                                         <span className='tick-2'><FontAwesomeIcon icon={faCheck} /></span>
-                                    </div>
-                                </div>
-                            </div>))}
-                        <div ref={messagesEndRef}></div>
+                                    </div> */}
+                                        </div>
+                                    </div>))}
+                                <div ref={messagesEndRef}></div>
+                            </>
+                        }
+
                     </div>
 
                     <div className="chat-input">
@@ -209,6 +245,7 @@ function ChatWindow({ UserIdToselectedChat, setSelectedChat, }) {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }
