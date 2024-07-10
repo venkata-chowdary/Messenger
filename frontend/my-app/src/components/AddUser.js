@@ -43,7 +43,7 @@ function AddUser({ setUsersListUpdate, handleChatClick }) {
                 console.log(data);
                 setUsersListUpdate(value => !value);
                 setSearchQuery('');
-                handleChatClick(userId);
+                handleChatClick(data.data._id);
                 setSearchResults([]);
                 setIsVisible(false);
             })

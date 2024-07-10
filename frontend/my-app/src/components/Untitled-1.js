@@ -14,7 +14,22 @@
     //     }
     // }, [chatDetails, config]);
 
-
+// function fetchMessages() {
+    //     setLoading(true)
+    //     if (chatDetails._id) {
+    //         console.log(chatDetails)
+    //         axios.get(`http://localhost:4000/api/message/${chatDetails._id}`, config)
+    //             .then((response) => {
+    //                 setMessages(response.data);
+    //                 socket.emit("join room", chatDetails._id)
+    //                 setLoading(false)
+    //                 console.log(response.data)
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err);
+    //             });
+    //     }
+    // }
 
     useEffect(() => {
         if (UserIdToselectedChat) {

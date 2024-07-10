@@ -1,3 +1,4 @@
+const { compareSync } = require("bcryptjs");
 const Chat = require("../models/chatModel");
 const Message = require("../models/messageModel");
 const User = require('../models/userModel')
@@ -12,7 +13,6 @@ const accessChat = async (req, res) => {
         return res.sendStatus(400);
 
     }
-
     try {
         let isChat = await Chat.find({
             isGroupChat: false,
@@ -53,18 +53,20 @@ const accessChat = async (req, res) => {
 
 // get- /api/chat
 const fetchChats = async (req, res) => {
+
+
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
         .populate("users", "-password")
         .populate("latestMessage")
+
         .sort({ updatedAt: -1 })
-
-
         .then(async (results) => {
             results = await User.populate(results, {
                 path: "latestMessage.sender",
                 select: "name pic email",
             });
             res.status(200).send(results);
+            console.log(results)
         })
         .catch((err) => {
             console.log(err)
@@ -73,23 +75,35 @@ const fetchChats = async (req, res) => {
 
 // GET - /api/chat/:chatId
 
-const loadChat=(req,res)=>{
+const loadChat = (req, res) => {
+    const chatId = req.params.chatId
 
-    const chatId=req.params.chatId
 
-    if(!chatId){
-        return res.status(400).send({message:"chatId is required."})
+    if (!chatId) {
+        return res.status(400).send({ message: "chatId is required." })
     }
 
     Chat.findById(chatId)
-    .populate("users","-password")
-    .then((response)=>{
-        res.status(200).json(response)
-    })
-    .catch((err)=>{
-        console.log(err)
-    })
+        .populate("users", "-password")
+        .populate("latestMessage")
+        .populate('latestMessage.sender')
+        .then(async (response) => {
+            if (!response) {
+                return res.status(400).send({ message: "Chat not found." })
+            }
+            response = await User.populate(response, {
+                path: "latestMessage.sender",
+                select: "name pic email",
+            });
+    
+            res.status(200).json(response);
+
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 }
+
 // DELETE - /api/chat/deletechat
 const deleteChat = (req, res) => {
     const chatToDelete = req.params.chatId;
@@ -132,12 +146,12 @@ const getUnreadMessageCount = (req, res) => {
     const { chatId } = req.params
     Message.find({ chat: chatId, readBy: { $ne: req.user._id } })
         .then((response) => {
-            const unreadCount=response.length
+            const unreadCount = response.length
             console.log(unreadCount)
-            res.status(200).json({unreadCount})
+            res.status(200).json({ unreadCount })
         })
         .catch((err) => {
             res.status(500).json({ message: error.message });
         })
 }
-module.exports = { accessChat, fetchChats, deleteChat, markMessageAsRead, getUnreadMessageCount,loadChat }
+module.exports = { accessChat, fetchChats, deleteChat, markMessageAsRead, getUnreadMessageCount, loadChat }

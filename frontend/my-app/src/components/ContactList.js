@@ -6,7 +6,7 @@ import ChatItem from './ChatItem'
 import AddUser from "./AddUser";
 import CreateGroup from "./CreateGroup";
 
-function ContactList({handleChatClick,usersListUpdated, setUsersListUpdate}) {
+function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) {
     const [contactList, setContactList] = useState([]);
     const { userDetails } = useContext(UserContext);
     const [searchQuery, setSearchQuery] = useState('')
@@ -18,6 +18,8 @@ function ContactList({handleChatClick,usersListUpdated, setUsersListUpdate}) {
         }
     };
 
+    const groupIconUrl = 'https://static.vecteezy.com/system/resources/previews/026/019/617/non_2x/group-profile-avatar-icon-default-social-media-forum-profile-photo-vector.jpg';
+
 
     //Chat List GET - /api/chat
     useEffect(() => {
@@ -25,14 +27,33 @@ function ContactList({handleChatClick,usersListUpdated, setUsersListUpdate}) {
         axios.get('http://localhost:4000/api/chat', config)
             .then((response) => {
                 const chatData = response.data
+                // console.log(chatData)
                 const users = chatData.reduce((allUsers, chat) => {
-                    chat.users.forEach(user => {
-                        if (user._id !== userDetails._id) {
-                            allUsers.push(user);
-                        }
-                    });
+                    if (chat.isGroupChat) {
+                        allUsers.push({
+                            _id: chat._id,
+                            name: chat.chatName,
+                            profilePhoto: groupIconUrl, // Use the default group icon
+                            isGroupChat: true,
+                            updatedAt:chat.updatedAt,
+                            latestMessage:chat.latestMessage
+                        });
+                    } else {
+                        chat.users.forEach(user => {
+                            if (user._id !== userDetails._id) {
+                                allUsers.push({
+                                    _id: chat._id,
+                                    name: user.name,
+                                    profilePhoto: user.profilePhoto,
+                                    isGroupChat: false,
+                                    updatedAt:chat.updatedAt,
+                                    latestMessage:chat.latestMessage
+                                });
+                            }
+                        });
+                    }
                     return allUsers;
-                }, []);
+                }, []); 
                 setContactList(users);
                 setLoading(false)
             })
@@ -42,15 +63,15 @@ function ContactList({handleChatClick,usersListUpdated, setUsersListUpdate}) {
     }, [userDetails.token, usersListUpdated]);
 
 
-    const searchedChats = contactList.filter(user =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    // const searchedChats = contactList.filter(user =>
+    //     user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    // )
 
     return (
         <div className="contact-list">
             <div className="chats-heading">
                 <h2>Chats</h2>
-                <AddUser setUsersListUpdate={setUsersListUpdate} handleChatClick={handleChatClick}/>
+                <AddUser setUsersListUpdate={setUsersListUpdate} handleChatClick={handleChatClick} />
             </div>
             <div className="search-bar">
                 <input
@@ -65,13 +86,14 @@ function ContactList({handleChatClick,usersListUpdated, setUsersListUpdate}) {
                     <span className="contact-list-loader"></span>
                     :
                     <div className="chats">
-                        {searchedChats.map(user => (
+                        {contactList.map(chat => (
                             <ChatItem
-                                key={user._id}
-                                _id={user._id}
-                                profilePhoto={user.profilePhoto}
-                                name={user.name}
+                                key={chat._id}
+                                _id={chat._id}
+                                profilePhoto={chat.profilePhoto}
+                                name={chat.name}
                                 handleChatClick={handleChatClick}
+                                isGroupChat={chat.isGroupChat}
                             />
                         ))}
                     </div>

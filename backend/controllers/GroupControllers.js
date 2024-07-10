@@ -14,10 +14,22 @@ const createGroupChat = (req, res) => {
         isGroupChat: true,
         users: users,
         groupAdmins: adminIds,
+        profilePhoto:'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vecteezy.com%2Fvector-art%2F25379582-people-group-profile-icon-vector-social-media-business-forum-avatar-photo&psig=AOvVaw0yxPvl5lif7DGtLmARSpkg&ust=1720659500028000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKiw7qSim4cDFQAAAAAdAAAAABAE',
         latestMessage: null
     })
         .then((newChat) => {
-            res.status(200).json({ newChat })
+            console.log(newChat)
+
+            Chat.findById(newChat._id)
+                .populate("users", "-passwords")
+                .populate('groupAdmins', "-passwords")
+                .then((groupChat) => {
+                    res.status(200).json({ groupChat })
+
+                })
+                .catch((err)=>{
+                    console.log(err)
+                })
         })
         .catch((err) => {
             console.log(err)
@@ -170,16 +182,16 @@ const removeAdmin = (req, res) => {
                 return res.status(400).json({ error: "User is not an admin." });
             }
 
-            Chat.findByIdAndUpdate(chatId,{$pull:{groupAdmins:userId}},{new:true})
-            .then((updatedChat)=>{
-                console.log(updatedChat)
-                return res.status(200).json({message:"User removed as admin successfully"})
-            })
-            .catch((err)=>{
-                res.status(500).send({message:"Server Error",err})
-            })
+            Chat.findByIdAndUpdate(chatId, { $pull: { groupAdmins: userId } }, { new: true })
+                .then((updatedChat) => {
+                    console.log(updatedChat)
+                    return res.status(200).json({ message: "User removed as admin successfully" })
+                })
+                .catch((err) => {
+                    res.status(500).send({ message: "Server Error", err })
+                })
         })
 }
 
 
-module.exports = { createGroupChat, addUserstoGroup, renameGroup, removeUserFromGroup, addAdmin,removeAdmin }
+module.exports = { createGroupChat, addUserstoGroup, renameGroup, removeUserFromGroup, addAdmin, removeAdmin }

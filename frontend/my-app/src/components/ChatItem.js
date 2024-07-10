@@ -3,9 +3,9 @@ import '../styles/ContactList.css';
 import axios from 'axios';
 import { UserContext } from '../context/UserContext';
 
-function ChatItem({_id,profilePhoto,name,handleChatClick}) {
+function ChatItem({ _id, profilePhoto, name, handleChatClick, isGroupChat }) {
 
-    
+
     const otherUserId = _id
     const [chatDetails, setChatDetails] = useState({})
     const { userDetails } = useContext(UserContext)
@@ -19,7 +19,17 @@ function ChatItem({_id,profilePhoto,name,handleChatClick}) {
     };
 
     useEffect(() => {
-        axios.post('http://localhost:4000/api/chat', { userId: otherUserId }, config)
+        // axios.post('http://localhost:4000/api/chat', { userId: otherUserId,chatId:chatDetails._id }, config)
+        //     .then((response) => {
+        //         if (response.status === 200) {
+        //             setChatDetails(response.data)
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         console.log(err)
+        //     })
+
+        axios.get(`http://localhost:4000/api/chat/${_id}`, config)
             .then((response) => {
                 if (response.status === 200) {
                     setChatDetails(response.data)
@@ -46,14 +56,13 @@ function ChatItem({_id,profilePhoto,name,handleChatClick}) {
     function handleChatItemClick(e) {
         axios.post(`http://localhost:4000/api/chat/${chatDetails._id}/mark-as-read`, {}, config)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 setUnreadCount(0)
             })
             .catch((err) => {
                 console.log(err)
             })
         handleChatClick(chatDetails._id)
-
     }
 
     return (
@@ -71,10 +80,10 @@ function ChatItem({_id,profilePhoto,name,handleChatClick}) {
             </div>
             <div className="chat-meta">
                 <div className="chat-time">{new Date(chatDetails.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                {unreadCount > 0 ? 
-                <div className="chat-unread-count">
-                    {unreadCount}
-                </div>:null}
+                {unreadCount > 0 ?
+                    <div className="chat-unread-count">
+                        {unreadCount}
+                    </div> : null}
             </div>
         </div>
     );
