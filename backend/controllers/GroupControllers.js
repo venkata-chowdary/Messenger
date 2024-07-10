@@ -14,7 +14,6 @@ const createGroupChat = (req, res) => {
         isGroupChat: true,
         users: users,
         groupAdmins: adminIds,
-        profilePhoto:'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vecteezy.com%2Fvector-art%2F25379582-people-group-profile-icon-vector-social-media-business-forum-avatar-photo&psig=AOvVaw0yxPvl5lif7DGtLmARSpkg&ust=1720659500028000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKiw7qSim4cDFQAAAAAdAAAAABAE',
         latestMessage: null
     })
         .then((newChat) => {
