@@ -162,4 +162,17 @@ const updatePassword = (req, res) => {
                 })
         })
 }
-module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword };
+
+const getAllUsers=(req,res)=>{
+    
+    User.find({})
+    .select('-password')
+    .then((allusersData)=>{
+        const otherUsers=allusersData.filter((user)=>{
+            return user._id.toString()!==req.user._id.toString()
+        })
+        res.status(200).json({otherUsers})
+    })
+}
+
+module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword,getAllUsers };

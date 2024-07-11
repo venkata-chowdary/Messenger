@@ -126,7 +126,6 @@
     background-color: #c82333;
 }
 
-
 .chat-messages {
     height: 100%;
     max-height: 71vh;
@@ -137,19 +136,61 @@
     display: flex;
     flex-direction: column;
     line-height: 1.4;
-    gap: 6px;
+    gap: 12px;
 }
 
-.message {
-    position: relative;
+.sender-profile-photo-message{
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 0px;
+}
+
+.message{
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.message-container{
+    background-color: #262d31;
     max-width: 36%;
     padding: 10px 16px;
-    margin: 5px;
     border-radius: 10px;
-    word-wrap: break-word;
-    display: flex;
-    flex-direction: column;
-    background-color: #262d31;
+    position: relative;
+
+}
+.current-user{
+    flex-direction: row-reverse;
+}
+
+.no-profile{
+    opacity: 0;
+}
+
+.current-user-message{
+    background-color: #005a8c;
+    border-radius: 10px 10px 0 10px;
+    margin-right: 8px;
+}
+
+.current-user-message::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: -5px;
+    border-top: 14px solid transparent;
+    border-left: 10px solid #005a8c; 
+}
+
+.other-user-message{
+    border-radius: 10px 10px 10px 0px;
+    /* margin: 5px 5px 5px 8px; */
+    margin-left: 8px;
+
 }
 
 .other-user-message::after {
@@ -161,17 +202,6 @@
     border-right: 10px solid #262d31;
 }
 
-.message div{
-    display: flex;
-    gap: 6px;
-    align-items: center;
-}
-
-.message svg{
-    padding: 4px 0 0;
-    font-size: 12px;
-    line-height: 0;
-}
 
 .read-by-ticks{
     position: relative;
@@ -188,37 +218,11 @@
     top: 0.5px;
 }
 
-.message .timestamp {
+.message-container .timestamp {
     align-self: flex-end;
     font-size: 0.7rem;
     margin-top: 2px;
     color: #ccc;
-}
-
-
-.current-user-message {
-    align-self: flex-end;
-    background-color: #005a8c;
-    color: white;
-    border-radius: 10px 10px 0 10px;
-    margin-left: auto;
-}
-
-.current-user-message::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    right: -5px;
-    border-top: 14px solid transparent;
-    border-left: 10px solid #005a8c; 
-}
-
-.other-user-message {
-    align-self: flex-start;
-    background-color: #262d31;
-    color: white;
-    border-radius: 10px 10px 10px 0px;
-    margin-right: auto;
 }
 
 .chat-input {

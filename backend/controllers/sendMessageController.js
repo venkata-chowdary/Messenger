@@ -33,7 +33,6 @@ const sendMessage = async (req, res) => {
     }
 }
 
-
 const allMessages = async (req, res) => {
     const {chatId}=req.params
     try {
@@ -46,7 +45,6 @@ const allMessages = async (req, res) => {
         
     }
 }
-
 
 
 module.exports = { sendMessage,allMessages }

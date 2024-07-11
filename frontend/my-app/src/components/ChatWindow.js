@@ -155,7 +155,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
         }
     }, [chatDetails, config]);
 
-    console.log(chatDetails)
+    console.log(messages)
     return (
         <div className="chat-window">
             {selectedChat && chatDetails ? (
@@ -177,10 +177,10 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
                                 </span>
                             </div>
                         </div>
-                        {chatDetails.isGroupChat ?
-                            <div style={{display:'flex',gap:6}}>
+                        {/* {chatDetails.isGroupChat ?
+                            <div style={{ display: 'flex', gap: 6 }}>
                                 {chatDetails.users.map((user) => <p>{user.name},</p>)}
-                            </div> : null}
+                            </div> : null} */}
                         <div className='header-menu'>
                             <button className="delete-button" onClick={handleDelete} title="Delete">
                                 <FontAwesomeIcon icon={faTrashAlt} />
@@ -188,14 +188,20 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
                         </div>
                     </div>
                     <div className="chat-messages">
-                        {messages.map((message) => (
-                            <div key={message._id} className={`message ${message.sender._id === userDetails._id ? 'current-user-message' : 'other-user-message'}`}>
-                                <p>{message.content}</p>
-                                <div>
-                                    <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        {(Array.isArray(messages) ? messages : []).map((message, i) => (
+                            <div key={message._id} className={`message ${message.sender._id === userDetails._id ? 'current-user' : 'other-user'}`}>
+                                <img
+                                    src={message.sender.profilePhoto}
+                                    className={`sender-profile-photo-message ${message.sender._id === userDetails._id ? 'current-user-photo' : 'other-user-photo'} ${(i === messages.length - 1 || message.sender._id !== messages[i + 1]?.sender._id) ? 'profile': 'no-profile'}`} />
+                                <div className={`message-container ${message.sender._id === userDetails._id ? 'current-user-message' : 'other-user-message'}`}>
+                                    <p>{message.content}</p>
+                                    <div>
+                                        <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    </div>
                                 </div>
                             </div>
                         ))}
+
                         <div ref={messagesEndRef}></div>
                     </div>
                     <div className="chat-input">

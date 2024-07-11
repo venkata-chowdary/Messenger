@@ -27,7 +27,7 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
         axios.get('http://localhost:4000/api/chat', config)
             .then((response) => {
                 const chatData = response.data
-                // console.log(chatData)
+                console.log(chatData)
                 const users = chatData.reduce((allUsers, chat) => {
                     if (chat.isGroupChat) {
                         allUsers.push({
@@ -56,6 +56,7 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
                 }, []); 
                 setContactList(users);
                 setLoading(false)
+                console.log(contactList)
             })
             .catch((err) => {
                 console.log('Error fetching chats:', err);
@@ -72,6 +73,7 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
             <div className="chats-heading">
                 <h2>Chats</h2>
                 <AddUser setUsersListUpdate={setUsersListUpdate} handleChatClick={handleChatClick} />
+                <CreateGroup setUsersListUpdate={setUsersListUpdate}/>
             </div>
             <div className="search-bar">
                 <input

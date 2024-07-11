@@ -1,0 +1,94 @@
+.create-group-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.create-group-btn:hover {
+    background-color: #0056b3;
+}
+
+.new-group {
+    display: flex;
+    position: relative;
+}
+
+.search-container {
+    max-height: 0;
+    min-width: 260px;
+    overflow: hidden;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: rgba(42, 42, 42, 0.9);
+    border-bottom: 0px solid #007bff;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out, border-bottom 0.3s ease-out;
+}
+
+.search-container.visible {
+    max-height: 500px;
+    min-width: 260px;
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 999;
+    border-bottom: 2.5px solid #007bff;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    background-color: #3a3a3a;
+    color: white;
+    outline: none;
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+.search-input:focus {
+    border-color: #007bff;
+}
+
+.recommendations {
+    z-index: 1000;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+.recommendations ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.recommendations li {
+    width: 100%;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.1s ease;
+}
+
+.recommendations li:hover {
+    background-color: #3a3a3a;
+}
+
+.recommendation-profile-photo {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}

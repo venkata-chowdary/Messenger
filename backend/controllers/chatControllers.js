@@ -54,19 +54,18 @@ const accessChat = async (req, res) => {
 // get- /api/chat
 const fetchChats = async (req, res) => {
 
-
+    console.log("yes")
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
         .populate("users", "-password")
         .populate("latestMessage")
-
         .sort({ updatedAt: -1 })
         .then(async (results) => {
+            console.log(results)
             results = await User.populate(results, {
                 path: "latestMessage.sender",
                 select: "name pic email",
             });
             res.status(200).send(results);
-            console.log(results)
         })
         .catch((err) => {
             console.log(err)
@@ -109,7 +108,6 @@ const deleteChat = (req, res) => {
     const chatToDelete = req.params.chatId;
     Message.deleteMany({ chat: chatToDelete })
         .then((response) => {
-            console.log(response)
             if (response.deletedCount === 0) {
                 return res.status(400).json({ message: "No messages found to delete." })
             }
@@ -119,7 +117,6 @@ const deleteChat = (req, res) => {
             if (!response) {
                 return res.status(404).json({ message: "Chat not found" });
             }
-            console.log(response);
             res.status(200).json({ message: "Chat and related messages deleted" });
         })
         .catch((err) => {
@@ -147,7 +144,6 @@ const getUnreadMessageCount = (req, res) => {
     Message.find({ chat: chatId, readBy: { $ne: req.user._id } })
         .then((response) => {
             const unreadCount = response.length
-            console.log(unreadCount)
             res.status(200).json({ unreadCount })
         })
         .catch((err) => {

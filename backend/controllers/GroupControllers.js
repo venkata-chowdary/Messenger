@@ -9,20 +9,21 @@ const createGroupChat = (req, res) => {
     if (!groupName || !users || !adminIds) {
         return res.status(400).json({ error: "Please fill all the fields." })
     }
+
+    const allGroupUsers=users.concat(adminIds)
     Chat.create({
         chatName: groupName,
         isGroupChat: true,
-        users: users,
+        users: allGroupUsers,
         groupAdmins: adminIds,
         latestMessage: null
     })
         .then((newChat) => {
-            console.log(newChat)
-
             Chat.findById(newChat._id)
                 .populate("users", "-passwords")
                 .populate('groupAdmins', "-passwords")
                 .then((groupChat) => {
+                    console.log(groupChat)
                     res.status(200).json({ groupChat })
 
                 })

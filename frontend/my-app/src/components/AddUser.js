@@ -35,8 +35,6 @@ function AddUser({ setUsersListUpdate, handleChatClick }) {
         }
     };
 
-
-
     const handleUserSelect = (userId) => {
         axios.post('http://localhost:4000/api/chat', { userId }, config)
             .then(data => {
