@@ -111,7 +111,7 @@
 .edit-mode input {
     flex: 1;
     height: 32px;
-    padding: 4px 0;
+    padding: 8px 6px 12px;
     font-size: 16px;
     border: 0;
     border-bottom: 2px solid #007bff;
@@ -128,6 +128,7 @@
 .edit-mode button {
     border: 0;
     background-color: #007bff;
+
     color: white;
     padding: 8px 12px;
     font-size: 12px;

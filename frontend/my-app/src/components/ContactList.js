@@ -35,8 +35,8 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
                             name: chat.chatName,
                             profilePhoto: groupIconUrl, // Use the default group icon
                             isGroupChat: true,
-                            updatedAt:chat.updatedAt,
-                            latestMessage:chat.latestMessage
+                            updatedAt: chat.updatedAt,
+                            latestMessage: chat.latestMessage
                         });
                     } else {
                         chat.users.forEach(user => {
@@ -46,14 +46,14 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
                                     name: user.name,
                                     profilePhoto: user.profilePhoto,
                                     isGroupChat: false,
-                                    updatedAt:chat.updatedAt,
-                                    latestMessage:chat.latestMessage
+                                    updatedAt: chat.updatedAt,
+                                    latestMessage: chat.latestMessage
                                 });
                             }
                         });
                     }
                     return allUsers;
-                }, []); 
+                }, []);
                 setContactList(users);
                 setLoading(false)
                 console.log(contactList)
@@ -72,8 +72,11 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
         <div className="contact-list">
             <div className="chats-heading">
                 <h2>Chats</h2>
-                <AddUser setUsersListUpdate={setUsersListUpdate} handleChatClick={handleChatClick} />
-                <CreateGroup setUsersListUpdate={setUsersListUpdate}/>
+                <div className="create-btns">
+                    <AddUser setUsersListUpdate={setUsersListUpdate} handleChatClick={handleChatClick} />
+                    <CreateGroup setUsersListUpdate={setUsersListUpdate} />
+                </div>
+
             </div>
             <div className="search-bar">
                 <input

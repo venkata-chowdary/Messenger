@@ -126,7 +126,6 @@ const updateProfilePicture = (req, res) => {
 }
 
 
-
 const updatePassword = (req, res) => {
     const newPassword = req.body.newPassword
     const oldPassword = req.body.oldPassword
@@ -164,7 +163,6 @@ const updatePassword = (req, res) => {
 }
 
 const getAllUsers=(req,res)=>{
-    
     User.find({})
     .select('-password')
     .then((allusersData)=>{

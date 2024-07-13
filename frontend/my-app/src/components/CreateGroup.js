@@ -1,6 +1,6 @@
 import React, { useState, useRef, useContext, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserGroup, prefix } from '@fortawesome/free-solid-svg-icons';
+import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { UserContext } from '../context/UserContext';
 import '../styles/CreateGroup.css';
@@ -10,13 +10,12 @@ function CreateGroup({ setUsersListUpdate }) {
     const [searchResults, setSearchResults] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
-    const [step, setStep] = useState(1); // 1: Select users, 2: Enter group name
-
-    const [allUsers, setAllUsers] = useState([])
+    const [step, setStep] = useState(1);
+    const [allUsers, setAllUsers] = useState([]);
+    const [initialUsers, setInitialUsers] = useState([]);
     const { userDetails } = useContext(UserContext);
     const createGroupRef = useRef(null);
-
-    const [groupName, setGroupName] = useState('')
+    const [groupName, setGroupName] = useState('');
 
     const config = {
         headers: {
@@ -27,7 +26,6 @@ function CreateGroup({ setUsersListUpdate }) {
     const handleSearchChange = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
-
         if (query.length >= 2) {
             axios.get(`http://localhost:4000/api/user/search?searchName=${query}`, config)
                 .then(response => {
@@ -45,52 +43,44 @@ function CreateGroup({ setUsersListUpdate }) {
         axios.get('http://localhost:4000/api/user/get-users', config)
             .then((users) => {
                 if (users.status === 200) {
-                    const allOtherUsers = users.data.otherUsers
-                    setAllUsers(allOtherUsers)
+                    setAllUsers(users.data.otherUsers);
+                    setInitialUsers(users.data.otherUsers.slice(0, 5));
                 }
             })
             .catch((err) => {
-                console.log(err)
-            })
-    }, [])
+                console.log(err);
+            });
+    }, [config]);
 
     const handleCreateGroupClick = () => {
         setIsVisible(!isVisible);
     };
 
-    const handleAddUser = (user) => {
-        setSelectedUsers(prevUsers => [...prevUsers, user]);
-    };
-
-    const handleRemoveUser = (userToRemove) => {
-        setSelectedUsers(prevUsers => prevUsers.filter(user => user._id !== userToRemove._id));
+    const handleUserSelect = (user) => {
+        const alreadySelected = selectedUsers.find(u => u._id === user._id);
+        if (alreadySelected) {
+            setSelectedUsers(prevUsers => prevUsers.filter(u => u._id !== user._id));
+        } else {
+            setSelectedUsers(prev => [...prev, user]);
+        }
     };
 
     const handleCreateGroup = () => {
-
-        console.log(selectedUsers, groupName)
-
-        const selectedUsersId = selectedUsers.map(user => user._id)
-        console.log(selectedUsersId)
-        const adminIds = [userDetails._id]
+        const selectedUsersId = selectedUsers.map(user => user._id);
+        const adminIds = [userDetails._id];
         axios.post(`http://localhost:4000/api/chat/group`, { groupName, users: selectedUsersId, adminIds }, config)
             .then((response) => {
-                console.log(response)
                 if (response.status === 200) {
-                    setUsersListUpdate(prev => !prev)
-
-
+                    setUsersListUpdate(prev => !prev);
                     setSelectedUsers([]);
                     setSearchQuery('');
                     setSearchResults([]);
                     setIsVisible(false);
                 }
             })
-
-
-        // Example: alert(`Creating group with ${selectedUsers.length} users: ${selectedUsers.map(user => user.name).join(', ')}`);
-
-
+            .catch((err) => {
+                console.error('Error creating group:', err);
+            });
     };
 
     useEffect(() => {
@@ -106,51 +96,40 @@ function CreateGroup({ setUsersListUpdate }) {
         };
     }, [createGroupRef]);
 
-
-    function handleUserSelect(user) {
-
-        const alreadySelected = selectedUsers.find(u => u._id === user._id);
-
-        if (alreadySelected) {
-            setSelectedUsers(prevUsers => prevUsers.filter(ex => ex._id !== user._id))
-        }
-        else {
-            setSelectedUsers(prev => [...prev, user])
-        }
-    }
-
-    function handleNextStep() {
+    const handleNextStep = () => {
         if (step === 1) {
-            setStep(2)
-            console.log(selectedUsers)
+            setStep(2);
         }
-    }
+    };
 
-    function handleCancel() {
+    const handleCancel = () => {
         if (step === 2) {
-            setStep(1)
+            setStep(1);
+        } else {
+            setIsVisible(false);
         }
-    }
+    };
+
     return (
         <div className="new-group" ref={createGroupRef}>
             <div className="create-group-btn" onClick={handleCreateGroupClick}>
-                <p>New Group <FontAwesomeIcon icon={faUserGroup} /></p>
+                <p>New Group</p>
             </div>
-            {isVisible && (
-                <div className="search-container visible">
-                    {step === 1 && (
-                        <>
-                            <input
-                                type='text'
-                                placeholder='Search users...'
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                className="search-input"
-                            />
-                            <div className="recommendations">
-                                <ul>
-                                    {allUsers.map(user => (
-                                        <li key={user._id} onClick={() => handleUserSelect(user)}>
+            <div className={`search-container ${isVisible ? 'visible' : ''}`}>
+                {step === 1 && isVisible && (
+                    <>
+                        <input
+                            type="text"
+                            placeholder="Search users..."
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="search-input"
+                        />
+                        <div className="recommendations">
+                            <ul>
+                                {(searchQuery.length >= 2 ? searchResults : initialUsers).map(user => (
+                                    <li key={user._id} onClick={() => handleUserSelect(user)}>
+                                        <div className="checkbox-container">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedUsers.some(u => u._id === user._id)}
@@ -158,30 +137,35 @@ function CreateGroup({ setUsersListUpdate }) {
                                             />
                                             <img src={user.profilePhoto} alt={user.name} className="recommendation-profile-photo" />
                                             <p>{user.name}</p>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            {selectedUsers.length >= 2 && (
-                                <div className="button-container">
-                                    <button className="next-button" onClick={handleNextStep}>Next</button>
-                                    <button className="cancel-button" onClick={handleCancel}>Cancel</button>
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    {step == 2 && (
-                        <>
-                            <input className="group-name" onChange={e => setGroupName(e.target.value)} />
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        {selectedUsers.length >= 2 && (
                             <div className="button-container">
-                                <button className="create-group-button" onClick={handleCreateGroup}>Create Group</button>
+                                <button className="next-button" onClick={handleNextStep}>Next</button>
                                 <button className="cancel-button" onClick={handleCancel}>Cancel</button>
                             </div>
-                        </>
-                    )}
-                </div>
-            )}
+                        )}
+                    </>
+                )}
+                {step === 2 && isVisible && (
+                    <>
+                        <input
+                            type="text"
+                            placeholder="Enter group name"
+                            value={groupName}
+                            onChange={e => setGroupName(e.target.value)}
+                            className="group-name"
+                        />
+                        <div className="button-container">
+                            <button className="create-group-button" onClick={handleCreateGroup}>Create Group</button>
+                            <button className="cancel-button" onClick={handleCancel}>Cancel</button>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

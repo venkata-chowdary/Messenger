@@ -47,3 +47,30 @@
                 });
         }
     }, [UserIdToselectedChat]);
+
+
+
+    {/* <div className="group-mem-list">
+                    {chatDetails.users && chatDetails.users.map((user) => (
+                        <div className="group-mem">
+                            <div className="group-mem-profile">
+                                <img src={user.profilePhoto} />
+                            </div>
+                            <div className="group-mem-details">
+                                <h4>{user.name}</h4>
+                                <p>{user.about}</p>
+                            </div>
+
+                            {chatDetails.groupAdmins.includes(user._id) ? <span className="admin">Admin</span> :
+                                <div className="user-control-btns">
+                                    <button className="remove-user-btn" onClick={() => handleRemoveUser(user._id)}>
+                                        <FontAwesomeIcon icon={faUserMinus} />
+                                    </button>
+                                    <button className="make-admin-btn" onClick={() => handleMakeUserAdmin(user._id)}>
+                                        <FontAwesomeIcon icon={faUserTie} />
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    ))}
+                </div> */}

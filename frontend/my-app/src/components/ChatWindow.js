@@ -4,8 +4,9 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTrashAlt, faEllipsisVertical, faL } from '@fortawesome/free-solid-svg-icons';
 import io from 'socket.io-client';
+import ChatWindowEditMode from './ChatWindowEditMode';
 
 const ENDPOINT = 'http://localhost:4000';
 let socket;
@@ -24,6 +25,11 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
     const [loading, setLoading] = useState(false);
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
+    const [isChatButtonsVisible, setIsChatButtonsVisible] = useState(false)
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [isCurrentUserAdmin,setIsCurrentUserAdmin]=useState(false)
+    const [isAmdin,setIsAdmin]=useState(false)
+    const dropdownRef = useRef(null);
 
     const config = useMemo(() => ({
         headers: {
@@ -127,6 +133,9 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
 
                 if (chatData.isGroupChat) {
                     const otherGroupUsers = chatData.users.filter((user) => user._id !== userDetails._id);
+                    // setIsAdmin(chatDetails.groupAdmins.include(userDetails._id))
+                    // console.log(isAmdin)
+                    setIsAdmin(chatData.groupAdmins.includes(userDetails._id))
                     setOtherUserDetails([otherGroupUsers]);
                 } else {
                     const otherUser = chatData.users.find((user) => user._id !== userDetails._id);
@@ -155,70 +164,111 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
         }
     }, [chatDetails, config]);
 
-    console.log(messages)
+    function handleChatButtons() {
+        console.log('cliced')
+        setIsChatButtonsVisible(!isChatButtonsVisible)
+    }
+
+    useEffect(() => {
+
+    
+        function handleClickOutside(event) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsChatButtonsVisible(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+
+
+    function handleEditDetails() {
+        setIsEditMode(!isEditMode)
+    }
+
+    function handleCancelEdit() {
+
+    }
+
+    
+    function handleSaveEdit() {
+
+    }
+
+
     return (
         <div className="chat-window">
             {selectedChat && chatDetails ? (
-                <>
-                    <div className="chat-header">
-                        <div className="chat-header-info">
-                            <img src={chatDetails.isGroupChat ? groupIconUrl : otherUserDetails.profilePhoto} alt="Profile" className="chat-header-image" />
-                            <div className="chat-header-name">
-                                <h4>{chatDetails.isGroupChat ? chatDetails.chatName : otherUserDetails.name}</h4>
-                                <span>
-                                    {isTyping ? (
-                                        <div className="typing-indicator">
-                                            <span>Typing</span>
-                                            <div className="dot"></div>
-                                            <div className="dot"></div>
-                                            <div className="dot"></div>
-                                        </div>
-                                    ) : null}
-                                </span>
-                            </div>
-                        </div>
-                        {/* {chatDetails.isGroupChat ?
-                            <div style={{ display: 'flex', gap: 6 }}>
-                                {chatDetails.users.map((user) => <p>{user.name},</p>)}
-                            </div> : null} */}
-                        <div className='header-menu'>
-                            <button className="delete-button" onClick={handleDelete} title="Delete">
-                                <FontAwesomeIcon icon={faTrashAlt} />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="chat-messages">
-                        {(Array.isArray(messages) ? messages : []).map((message, i) => (
-                            <div key={message._id} className={`message ${message.sender._id === userDetails._id ? 'current-user' : 'other-user'}`}>
-                                <img
-                                    src={message.sender.profilePhoto}
-                                    className={`sender-profile-photo-message ${message.sender._id === userDetails._id ? 'current-user-photo' : 'other-user-photo'} ${(i === messages.length - 1 || message.sender._id !== messages[i + 1]?.sender._id) ? 'profile': 'no-profile'}`} />
-                                <div className={`message-container ${message.sender._id === userDetails._id ? 'current-user-message' : 'other-user-message'}`}>
-                                    <p>{message.content}</p>
-                                    <div>
-                                        <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
+                isEditMode ? (
+                    <ChatWindowEditMode handleCancelEdit={handleCancelEdit} handleSaveEdit={handleSaveEdit} chatDetails={chatDetails} config={config} setChatDetails={setChatDetails} setIsEditMode={setIsEditMode} isEditMode={isEditMode}/>
+                ) : (
+                    <>
+                        <div className="chat-header">
+                            <div className="chat-header-info">
+                                <img src={chatDetails.isGroupChat ? groupIconUrl : chatDetails.users[1].profilePhoto} alt="Profile" className="chat-header-image" />
+                                <div className="chat-header-name">
+                                    <h4>{chatDetails.isGroupChat ? chatDetails.chatName : chatDetails.users[1].name}</h4>
                                 </div>
                             </div>
-                        ))}
-
-                        <div ref={messagesEndRef}></div>
-                    </div>
-                    <div className="chat-input">
-                        <input
-                            type="text"
-                            placeholder="Type your message..."
-                            value={newMessage}
-                            onChange={handleInputChange}
-                            onKeyDown={(e) => {
-                                if (e.code === "Enter") {
-                                    handleSendMessage();
-                                }
-                            }}
-                        />
-                        <button onClick={handleSendMessage}>Send</button>
-                    </div>
-                </>
+                            {chatDetails.isGroupChat ? (
+                                <div className='header-menu'>
+                                    <button className='chat-menu-btn' onClick={handleChatButtons}>
+                                        <FontAwesomeIcon icon={faEllipsisVertical} />
+                                    </button>
+                                    {isChatButtonsVisible &&
+                                        <div className={`chat-menu-btns-list`} ref={dropdownRef}>
+                                            <button className='edit-group-details' onClick={handleEditDetails} disabled={!isAmdin}>
+                                                Edit Details
+                                            </button>
+                                            {/* <button className="delete-button" onClick={handleDelete} title="Delete">
+                                                Delete Chat
+                                            </button> */}
+                                            <button className="leave-button" title="Leave">
+                                                Leave Group
+                                            </button>
+                                        </div>}
+                                </div>
+                            ) : (
+                                <button className="delete-button" title="Delete">
+                                    <FontAwesomeIcon icon={faTrashAlt} />
+                                </button>
+                            )}
+                        </div>
+                        <div className="chat-messages">
+                            {(Array.isArray(messages) ? messages : []).map((message, i) => (
+                                <div key={message._id} className={`message ${message.sender._id === userDetails._id ? 'current-user' : 'other-user'}`}>
+                                    <img
+                                        src={message.sender.profilePhoto}
+                                        className={`sender-profile-photo-message ${message.sender._id === userDetails._id ? 'current-user-photo' : 'other-user-photo'} ${(i === messages.length - 1 || message.sender._id !== messages[i + 1]?.sender._id) ? 'profile' : 'no-profile'}`} />
+                                    <div className={`message-container ${message.sender._id === userDetails._id ? 'current-user-message' : 'other-user-message'}`}>
+                                        <p>{message.content}</p>
+                                        <div>
+                                            <span className='timestamp'>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            <div ref={messagesEndRef}></div>
+                        </div>
+                        <div className="chat-input">
+                            <input
+                                type="text"
+                                placeholder="Type your message..."
+                                value={newMessage}
+                                onChange={handleInputChange}
+                                onKeyDown={(e) => {
+                                    if (e.code === "Enter") {
+                                        handleSendMessage();
+                                    }
+                                }}
+                            />
+                            <button onClick={handleSendMessage}>Send</button>
+                        </div>
+                    </>
+                )
             ) : (
                 <div className="select-chat-message">
                     <div className="logo-container">

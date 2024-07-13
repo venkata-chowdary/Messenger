@@ -17,6 +17,13 @@
     align-items: center;
     background-color: #2a2a2a;
     padding: 12px 20px 8px;
+    gap: 20px;
+}
+
+.create-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }
 
 .chats-heading h2 {
@@ -25,17 +32,22 @@
     font-weight: bold;
 }
 
-.newchat-button,.create-group-btn {
+.newchat-button,
+.create-group-btn {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 10px 12px;
+    padding: 8px 10px;
     cursor: pointer;
     border-radius: 20px;
     font-weight: 500;
     transition: background-color 0.3s ease;
 }
 
+.newchat-button:hover,
+.create-group-btn:hover {
+    background-color: #0056b3;
+}
 
 .search-bar {
     background-color: #2a2a2a;
@@ -135,7 +147,6 @@
     margin-top: 5px;
 }
 
-
 .new-chat {
     display: flex;
     position: relative;
@@ -220,7 +231,8 @@
     background-color: #3a3a3a;
 }
 
-
+.chats{
+}
 /* Scrollbar */
 .chats::-webkit-scrollbar {
     width: 5px;
@@ -261,8 +273,8 @@
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
 }
-

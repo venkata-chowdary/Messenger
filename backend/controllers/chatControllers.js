@@ -77,7 +77,6 @@ const fetchChats = async (req, res) => {
 const loadChat = (req, res) => {
     const chatId = req.params.chatId
 
-
     if (!chatId) {
         return res.status(400).send({ message: "chatId is required." })
     }

@@ -50,7 +50,6 @@ function AddUser({ setUsersListUpdate, handleChatClick }) {
             });
     };
     
-
     const handleAddUserClick = () => {
         setIsVisible(!isVisible);
     };

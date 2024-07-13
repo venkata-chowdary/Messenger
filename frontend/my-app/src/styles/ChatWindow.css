@@ -8,6 +8,7 @@
     justify-content: space-between;
     border-radius: 0 10px 10px 0;
     height: 100%;
+    position: relative;
 }
 
 .select-chat-message {
@@ -51,7 +52,7 @@
 
 .chat-header {
     background-color: #2a2a2a;
-    padding: 9px 10px;
+    padding: 9px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -60,6 +61,7 @@
 .chat-header-info {
     display: flex;
     align-items: center;
+    user-select: none;
 }
 
 .chat-header-image {
@@ -76,6 +78,7 @@
     margin-bottom: 4px;
     letter-spacing: 1px;
     text-transform: capitalize;
+    user-select: none;
 }
 .typing-indicator{
     display: flex;
@@ -109,6 +112,54 @@
     40%{
         opacity: 1;
     }
+}
+
+.chat-menu-btn{
+    background-color: transparent;
+    border: 0;
+    color: #fff;
+    font-size: 18px;
+    position: relative;
+    padding: 10px 18px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.chat-menu-btn:hover{
+    transition: ease-in-out 0.3s;
+    background-color: #555;
+}
+
+.chat-menu-btns-list{
+    display: flex;
+    flex-direction: column;
+    /* margin-top: 10px; */
+    position: absolute;
+    right: 20px;
+    background-color: #333;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1;
+    min-width: 160px;
+    text-align: center;
+}
+
+
+
+.chat-menu-btns-list button{
+    color: #fff;
+    border: none;
+    padding: 12px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    background-color: #333;
+}
+
+.chat-menu-btns-list button:hover {
+    background-color: #555;
 }
 
 .delete-button {
@@ -161,8 +212,8 @@
     padding: 10px 16px;
     border-radius: 10px;
     position: relative;
-
 }
+
 .current-user{
     flex-direction: row-reverse;
 }

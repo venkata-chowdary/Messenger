@@ -133,7 +133,6 @@ function Profile() {
             return
         }
 
-
         if (newPassword.length < 6) {
             setPasswordError('Password must be at least 6 characters long.');
             setSaveLoading(false);
@@ -151,8 +150,6 @@ function Profile() {
             setSaveLoading(false);
             return;
         }
-
-
 
         setSaveLoading(true);
         axios.put(`http://localhost:4000/api/user/update-password`, { newPassword, oldPassword }, config)

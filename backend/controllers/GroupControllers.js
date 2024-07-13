@@ -10,7 +10,7 @@ const createGroupChat = (req, res) => {
         return res.status(400).json({ error: "Please fill all the fields." })
     }
 
-    const allGroupUsers=users.concat(adminIds)
+    const allGroupUsers = users.concat(adminIds)
     Chat.create({
         chatName: groupName,
         isGroupChat: true,
@@ -27,7 +27,7 @@ const createGroupChat = (req, res) => {
                     res.status(200).json({ groupChat })
 
                 })
-                .catch((err)=>{
+                .catch((err) => {
                     console.log(err)
                 })
         })
@@ -62,9 +62,10 @@ const addUserstoGroup = (req, res) => {
         .then((newUsers) => {
             console.log(newUsers)
             Chat.findByIdAndUpdate(chatId, { $addToSet: { users: { $each: newUsers } }, }, { new: true })
+            .populate("users","-passwords")
                 .then((updatedGroup) => {
                     console.log(updatedGroup)
-                    return res.status(200).json({ message: "User(s) added to group successfully" })
+                    return res.status(200).json({ message: "User(s) added to group successfully" ,updatedGroup})
                 })
                 .catch((err) => {
                     res.status(500).send({ message: 'Server Error', err })
@@ -93,27 +94,29 @@ const removeUserFromGroup = (req, res) => {
             }
 
             Chat.findByIdAndUpdate(chatId, { $pull: { users: userId } }, { new: true })
+            .populate("users","-passwords")
                 .then((updatedGroup) => {
                     console.log(updatedGroup)
-                    return res.status(200).json({ message: "User(s) removed from group successfully" })
+
+                    return res.status(200).json({ message: "User(s) removed from group successfully", updatedGroup })
                 })
                 .catch((err) => {
                     res.status(500).send({ message: 'Server Error', err })
                 })
         })
-
 }
 
-//PUT -api/chat/group/rename-group
+//PUT -api/chat/group/rename
 const renameGroup = (req, res) => {
     const { chatId, newGroupName } = req.body
+    console.log('rename')
     if (!chatId || !newGroupName) {
         return res.status(400).json({ error: "Please fill all the fields." })
     }
 
     Chat.findByIdAndUpdate(chatId, { chatName: newGroupName }, { new: true })
         .then((updatedGroup) => {
-            return res.status(200).json({ message: "Group renamed successfully" })
+            return res.status(200).json({ message: "Group renamed successfully", updatedGroup })
         })
         .catch((err) => {
             res.status(500).send({ message: 'Server Error', err })
