@@ -192,8 +192,6 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
     function handleCancelEdit() {
 
     }
-
-    
     function handleSaveEdit() {
 
     }

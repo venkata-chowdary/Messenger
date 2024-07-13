@@ -4,11 +4,11 @@ import img from '../assets/profile.jpeg'
 import '../styles/ChatWindowEditMode.css'
 import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faCheck, faArrowLeft, faUserMinus, faUserCheck, faUserEdit, faUserShield, faUserTie, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faCheck, faArrowLeft, faUserMinus, faUserCheck, faUserEdit, faUserShield, faUserTie, faUserPlus, faL } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios'
 import { UserContext } from "../context/UserContext";
 
-function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,isEditMode }) {
+function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode, isEditMode }) {
     const { userDetails } = useContext(UserContext)
     const groupName = chatDetails.chatName
     const groupMembers = chatDetails.users
@@ -16,7 +16,11 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
     const [editedName, setEditedName] = useState(groupName);
     const [searchResults, setSearchResults] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchLoader, setSearchLoader] = useState(false)
 
+
+    //Loaders
+    const [addLoader, setAddLoader] = useState(false)
     const handleNameEdit = () => {
         setEditMode(true);
     };
@@ -45,14 +49,17 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
 
     //Remove User from Group
     function handleRemoveUser(userId) {
+        setAddLoader(true)
         axios.put(`http://localhost:4000/api/chat/group/remove-user`, { chatId: chatDetails._id, userId }, config)
             .then((response) => {
                 if (response.status === 200) {
                     const { message, updatedGroup } = response.data;
+                    setTimeout(2000)
                     setChatDetails(prevData => ({
                         ...prevData,
                         users: updatedGroup.users
                     }));
+                    setAddLoader(false)
                 }
             })
             .catch((err) => {
@@ -69,6 +76,7 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
         setSearchQuery(query);
 
         if (query.length >= 2) {
+            setSearchLoader(true)
             axios.get(`http://localhost:4000/api/user/search?searchName=${query}`, config)
                 .then(response => {
                     const queryUsers = response.data
@@ -78,6 +86,9 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
                         })
                         setSearchResults(filteredUsers)
                     }
+                    setTimeout(() => {
+                        setSearchLoader(false)
+                    },2000)
                 })
                 .catch(error => {
                     console.error('Error fetching user search results:', error);
@@ -85,17 +96,20 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
         } else {
             setSearchResults([]);
         }
+
     };
 
     function handleUserSelectToAdd(user) {
         console.log(user)
+        setAddLoader(true)
         axios.put(`http://localhost:4000/api/chat/group/add-user`, { chatId: chatDetails._id, newUserIds: user._id }, config)
             .then((response) => {
                 console.log(response)
                 if (response.status === 200) {
                     const updatedGroup = response.data.updatedGroup
-                    console.log(updatedGroup.users)
+                    setTimeout(2000)
                     setChatDetails(prevData => ({ ...prevData, users: updatedGroup.users }))
+                    setAddLoader(false)
                     setSearchQuery('')
                     setSearchResults([])
                 }
@@ -106,7 +120,7 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
     }
     return (
         <div className="chat-window-edit">
-            <button className="back-btn" onClick={()=>setIsEditMode(false)}>
+            <button className="back-btn" onClick={() => setIsEditMode(false)}>
                 <FontAwesomeIcon icon={faArrowLeft} />
             </button>
             <div className="edit-chat-form">
@@ -135,29 +149,41 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
             <div className="add-user-group-section">
                 <h3>Add members</h3>
                 <div>
-                    <input type="text" placeholder="Search for users" onChange={handleSearchChange} value={searchQuery} />
+                    <input
+                        type="text"
+                        placeholder="Search for users"
+                        onChange={handleSearchChange}
+                        value={searchQuery}
+                    />
                 </div>
                 <div className="recommendations">
-                    <ul>
-                        {searchResults.map(user => (
-                            <li key={user._id} onClick={() => handleUserSelectToAdd(user)}>
-                                <div className="user-add-user">
-                                    <img src={user.profilePhoto} alt={user.name} className="recommendation-profile-photo" />
-                                    <h4>{user.name}</h4>
-                                    <button className="add-user-group">
-                                        <FontAwesomeIcon icon={faUserPlus} />
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+                    {searchLoader ? (
+                        <span className="loader"></span>
+                    ) : (
+                        searchResults.length > 0 && (
+                            <ul>
+                                {searchResults.map(user => (
+                                    <li key={user._id} onClick={() => handleUserSelectToAdd(user)}>
+                                        <div className="user-add-user">
+                                            <img src={user.profilePhoto} alt={user.name} className="recommendation-profile-photo" />
+                                            <h4>{user.name}</h4>
+                                            <button className="add-user-group">
+                                                <FontAwesomeIcon icon={faUserPlus} />
+                                            </button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                    )}
                 </div>
             </div>
+
             <div className="group-mem-section">
                 <div className="group-mem-section-header">
                     <h3>Group Members</h3>
                 </div>
-                {chatDetails.users && chatDetails.users.length > 0 ? (
+                {chatDetails.users && chatDetails.users.length && !addLoader > 0 ? (
                     <div className="group-mem-list">
                         {chatDetails.users.map((user) => (
                             <div key={user._id} className="group-mem">
@@ -184,7 +210,7 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails,setIsEditMode,
                         ))}
                     </div>
                 ) : (
-                    <p>No members found.</p>
+                    <span className="loader"></span>
                 )}
             </div>
         </div>

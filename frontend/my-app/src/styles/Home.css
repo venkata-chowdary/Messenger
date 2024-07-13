@@ -120,6 +120,21 @@
 }
 
 
+.loader{
+    width: 36px;
+    height: 36px;
+    border: 4px solid #FFF;
+    border-bottom-color: #007bff;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    position: absolute;
+    top: 25%;
+    left: 45%;
+    transform: translateX(-50%);
+}
+
 @media (max-width: 600px) {
     .header {
         flex-direction: column;

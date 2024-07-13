@@ -31,6 +31,14 @@
     height: fit-content;
 }
 
+.add-user-group-section{
+    position: relative;
+    height: 130px;
+}
+
+.group-mem-section{
+    min-height: 200px;
+}
 
 .chat-window-edit .back-btn {
     position: absolute;
@@ -94,6 +102,23 @@
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
+.recommendations .loader,
+.group-mem-section .loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: block;
+}
+
+.recommendations .loader{
+
+    width: 26px;
+    height: 26px;
+    top: 116px;
+    left: 50%;
+    transform: translateX(-50%);
+}
 .group-mem-details {
     flex: 1;
 }
@@ -110,6 +135,7 @@
     margin: 4px 0;
     color: #bbb;
 }
+
 
 .user-control-btns {
     display: flex;
@@ -160,8 +186,10 @@
 
 .add-user-group-section {
     margin-bottom: auto; 
-    max-height: 160px; /* Optional: Set max-height if needed */
+    max-height: 300px;
+     /* Optional: Set max-height if needed */
 }
+
 .user-add-user {
     display: flex;
     align-items: center;
@@ -187,3 +215,4 @@
 .add-user-group-section input:hover {
     border-bottom: 2.5px solid #007bff;
 }
+
