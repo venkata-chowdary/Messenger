@@ -64,9 +64,9 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
     }, [userDetails.token, usersListUpdated]);
 
 
-    // const searchedChats = contactList.filter(user =>
-    //     user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    // )
+    const searchedChats = contactList.filter(user =>
+        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
 
     return (
         <div className="contact-list">
@@ -91,7 +91,7 @@ function ContactList({ handleChatClick, usersListUpdated, setUsersListUpdate }) 
                     <span className="contact-list-loader"></span>
                     :
                     <div className="chats">
-                        {contactList.map(chat => (
+                        {searchedChats.map(chat => (
                             <ChatItem
                                 key={chat._id}
                                 _id={chat._id}

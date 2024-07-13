@@ -56,20 +56,22 @@
 
 .search-bar input {
     width: 100%;
-    padding: 10px 10px 8px;
+    padding: 8px;
     border: none;
-    border-radius: 20px;
+    border-radius: 10px;
     background-color: #3a3a3a;
     color: white;
     outline: none;
     font-size: 16px;
     transition: border 0.05s;
-    border-bottom: 2.5px solid transparent;
+    margin-bottom: 2.5px;
+    /* border-bottom: 2.5px solid transparent; */
 
 }
 
-.search-bar input:focus {
-    border-color: #007bff;
+.search-bar input:hover {
+    /* border-color: #007bff; */
+    margin-bottom: 0px;
     border-bottom: 2.5px solid #007bff;
 }
 

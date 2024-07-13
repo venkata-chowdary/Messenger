@@ -11,4 +11,5 @@ const AuthPage = ({ children }) => {
     );
 }
 
+
 export default AuthPage;

@@ -4,7 +4,7 @@ import '../styles/Auth.css'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {UserContext} from '../context/UserContext'
-
+import { Link } from 'react-router-dom';
 
 function Login() {
 
@@ -67,6 +67,7 @@ function Login() {
                     />
                     <button type="submit">Login</button>
                 </form>
+                <p>Don't have an account? <Link to='/signup'>Create an account</Link></p>
             </div>
         </AuthPage>
     );

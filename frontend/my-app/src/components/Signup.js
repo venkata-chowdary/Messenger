@@ -4,7 +4,10 @@ import AuthPage from '../pages/AuthPage';
 import '../styles/Auth.css'
 import axios from 'axios'
 import { UserContext } from '../context/UserContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faPen, faCheck, faCamera, faCircleXmark, faCircleCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 
+import { Link } from 'react-router-dom';
 function Signup() {
     const [name, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -15,6 +18,7 @@ function Signup() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
     const { setUserDetails } = useContext(UserContext)
+    const [passwordError, setPasswordError] = useState('')
 
     const postPhoto = (photo) => {
         setLoading(true)
@@ -58,6 +62,11 @@ function Signup() {
             return;
         }
 
+        if (password.length < 6) {
+            setPasswordError('Password must be at least 6 characters long.');
+            return;
+        }
+
         console.log(profilePic)
 
         axios.post('http://localhost:4000/api/user',
@@ -74,7 +83,6 @@ function Signup() {
                 console.log(err)
                 setError(err)
             })
-
     };
 
     return (
@@ -119,7 +127,12 @@ function Signup() {
                         onChange={(e) => postPhoto(e.target.files[0])}
                         accept="image/*"
                     />
-
+                    {passwordError && (
+                        <div className="error-message">
+                            <FontAwesomeIcon icon={faCircleXmark} className="error-icon" />
+                            <p>{passwordError}</p>
+                        </div>
+                    )}
                     {error && <p className="error">{error}</p>}
                     <button type="submit">
                         {loading ?
@@ -128,7 +141,9 @@ function Signup() {
                         }
                     </button>
                 </form>
+                <p>Already had an account? <Link to='/login'>Login</Link></p>
             </div>
+
         </AuthPage>
     );
 }

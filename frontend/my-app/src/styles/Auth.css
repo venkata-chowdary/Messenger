@@ -88,3 +88,18 @@ label[for="file-upload"] {
 label[for="file-upload"]:hover {
     background-color: #555;
 }
+
+a{
+    color: #007bff;
+    text-decoration: none;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 10px;
+    color: #dc3545;
+    font-size: 15px;
+    text-align: end;
+}
