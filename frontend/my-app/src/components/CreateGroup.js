@@ -44,7 +44,7 @@ function CreateGroup({ setUsersListUpdate }) {
             .then((users) => {
                 if (users.status === 200) {
                     setAllUsers(users.data.otherUsers);
-                    setInitialUsers(users.data.otherUsers.slice(0, 5));
+                    setInitialUsers(users.data.otherUsers.slice(0, 3));
                 }
             })
             .catch((err) => {
@@ -106,6 +106,7 @@ function CreateGroup({ setUsersListUpdate }) {
         if (step === 2) {
             setStep(1);
         } else {
+            setSelectedUsers([])
             setIsVisible(false);
         }
     };
