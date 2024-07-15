@@ -13,7 +13,7 @@ function Home() {
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedChat, setSelectedChat] = useState(null)
     const [usersListUpdated, setUsersListUpdate] = useState(false)
-
+    console.log(userDetails)
     const dropdownRef = useRef(null);
 
     const handleLogout = () => {

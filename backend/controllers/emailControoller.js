@@ -22,4 +22,5 @@ const sendOTP = (to, subject, text) => {
 
 
 
+
 module.exports = { sendOTP }

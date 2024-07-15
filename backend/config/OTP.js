@@ -2,6 +2,7 @@ const express=require('express')
 const otpGenerator = require('otp-generator');
 const {sendOTP}=require('../controllers/emailControoller')
 
+
 const generateOTP = async (req, res) => {
     const {email}=req.user
     req.app.locals.OTP = otpGenerator.generate(4, {

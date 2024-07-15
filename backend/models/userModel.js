@@ -10,7 +10,9 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
         // default: 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg'
-    }
+    },
+    isConfirmed: { type: Boolean, default: false }
+
 }, { timestamps: true })
 
 userSchema.pre('save',async function(next){

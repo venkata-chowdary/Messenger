@@ -1,39 +1,85 @@
 const express = require('express')
 const User = require('../models/userModel')
+const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const generateToken = require('../config/generateToken')
 const bcrypt = require('bcryptjs')
+const { JsonWebTokenError } = require('jsonwebtoken')
+const transporter = require('../util/transporter')
+
 
 
 const registerUser = async (req, res) => {
     const { name, email, password, profilePic } = req.body
     console.log("photo", profilePic)
     if (!name || !email || !password) {
-        res.status(400).json({ message: 'Enter All Fields' })
+        return res.status(400).json({ message: 'Enter All Fields' });
     }
 
-    const userExists = await User.findOne({ email })
+    const userExists = await User.findOne({ email });
     if (userExists) {
-        return res.send(400).json({ message: 'User already exsists' })
+        return res.status(400).json({ message: 'User already exists' });
     }
 
-    const user = await User.create({ name, email, password, profilePhoto: profilePic })
-    if (user) {
-        return res.status(201).json({
-            message: 'User created successfully',
-            data: {
-                name: user.name,
-                _id: user._id,
-                email: user.email,
-                profilePhoto: user.profilePhoto,
-                token: generateToken(user._id)
+    try {
+        const user = await User.create({ name, email, password, profilePhoto: profilePic });
+
+        const confirmToken = jwt.sign({ id: user._id }, 'emailconfirm', { expiresIn: '1h' });
+        const url = `http://localhost:4000/api/user/confirm/${confirmToken}`;
+
+        const mailOptions = {
+            from: 'your-email@gmail.com',
+            to: email,
+            subject: 'Account Confirmation',
+            html: `<h1>Welcome to Our App</h1>
+                   <p>Please confirm your account by clicking the link below:</p>
+                   <a href="${url}">Confirm Account</a>`
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ message: "Error sending confirmation email" });
+            } else {
+                console.log('Email sent: ' + info.response);
+                return res.status(200).json({
+                    message: "User created successfully, please check your email to confirm your account",
+                    data: {
+                        name: user.name,
+                        _id: user._id,
+                        email: user.email,
+                        profilePhoto: user.profilePhoto,
+                        token: generateToken(user._id)
+                    }
+                });
             }
         });
-    }
-    else {
+    } catch (error) {
+        console.log(error);
         return res.status(400).json({ message: 'Failed to create user' });
     }
 };
+
+const confirmAccount = async (req, res) => {
+    try {
+        const { token } = req.params;
+        console.log(token)
+        const decoded = jwt.verify(token, 'emailconfirm');
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token' });
+        }
+
+        user.isConfirmed = true; // Add an `isConfirmed` field to your User model
+        await user.save();
+
+        return res.status(200).json({ message: 'Account confirmed successfully' });
+    } catch (error) {
+        return res.status(400).json({ message: 'Error confirming account' });
+    }
+}
+
 
 const authUser = async (req, res) => {
     const { email, password } = req.body
@@ -125,52 +171,52 @@ const updateProfilePicture = (req, res) => {
         })
 }
 
-
 const updatePassword = (req, res) => {
-    const newPassword = req.body.newPassword
-    const oldPassword = req.body.oldPassword
+    const newPassword = req.body.newPassword;
+    const oldPassword = req.body.oldPassword;
 
-    console.log(newPassword,oldPassword)    
-    User.findOne(req.user._id)
-        .then((userData) => {
+    console.log(newPassword, oldPassword);
+    User.findById(req.user._id)
+        .then(userData => {
             if (!userData) {
                 return res.status(404).json({ message: "User not found" });
             }
 
             bcrypt.compare(oldPassword, userData.password)
-                .then((status) => {
+                .then(status => {
                     if (!status) {
-                        return res.status(400).json({ message: "Old password is incorrect" })
+                        return res.status(400).json({ message: "Old password is incorrect" });
                     }
-                    console.log(status)
+                    console.log(status);
                     bcrypt.genSalt(10)
                         .then(salt => bcrypt.hash(newPassword, salt))
-                        .then((hashedPassword) => {
+                        .then(hashedPassword => {
                             User.findByIdAndUpdate(req.user._id, { password: hashedPassword }, { new: true })
-                                .then((updatedData) => {
-                                    res.status(200).json({message:'password updated successfully.'})
+                                .then(updatedData => {
+                                    res.status(200).json({ message: 'Password updated successfully.' });
                                 })
-                                .catch((err) => {
-                                    console.log(err)
-                                })
-                        })
+                                .catch(err => {
+                                    console.log(err);
+                                    res.status(500).json({ message: "Server error" });
+                                });
+                        });
                 })
-                .catch((err) => {
-                    console.log(err)
+                .catch(err => {
+                    console.log(err);
                     res.status(500).json({ message: "Server error" });
-                })
-        })
-}
+                });
+        });
+};
 
 const getAllUsers=(req,res)=>{
     User.find({})
-    .select('-password')
+        .select('-password')
     .then((allusersData)=>{
         const otherUsers=allusersData.filter((user)=>{
             return user._id.toString()!==req.user._id.toString()
-        })
+            })
         res.status(200).json({otherUsers})
-    })
+        })
 }
 
-module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword,getAllUsers };
+module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword, getAllUsers,confirmAccount };
