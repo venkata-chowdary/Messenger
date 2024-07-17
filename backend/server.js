@@ -8,6 +8,7 @@ const { authMiddleware } = require('./middleware/authMiddleware');
 
 const app = express();
 const cors = require('cors');
+const { sign } = require('jsonwebtoken');
 app.use(express.json());
 app.use(cors());
 
