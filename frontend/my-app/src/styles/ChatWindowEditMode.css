@@ -20,7 +20,7 @@
 .add-user-group-section {
     background-color: #1c1c1c;
     color: white;
-    padding: 30px;
+    padding:30px;
     border-radius: 10px;
     width: 480px;
     text-align: left;
@@ -33,11 +33,12 @@
 
 .add-user-group-section{
     position: relative;
-    height: 130px;
+    height: fit-content;
 }
 
 .group-mem-section{
     min-height: 200px;
+    padding: 40px 30px;
 }
 
 .chat-window-edit .back-btn {
@@ -102,6 +103,10 @@
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
+.group-mem-section{
+    position: relative;
+}
+
 .recommendations .loader,
 .group-mem-section .loader {
     position: absolute;
@@ -112,7 +117,6 @@
 }
 
 .recommendations .loader{
-
     width: 26px;
     height: 26px;
     top: 116px;
@@ -135,7 +139,6 @@
     margin: 4px 0;
     color: #bbb;
 }
-
 
 .user-control-btns {
     display: flex;

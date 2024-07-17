@@ -13,6 +13,9 @@ function Home() {
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedChat, setSelectedChat] = useState(null)
     const [usersListUpdated, setUsersListUpdate] = useState(false)
+
+    const [chatWindowEditMode,setChatWindowEditMode]=useState(false)
+
     console.log(userDetails)
     const dropdownRef = useRef(null);
 
@@ -39,6 +42,7 @@ function Home() {
     function handleChatClick(_id) {
         console.log(_id)
         setSelectedChat(_id)
+        setChatWindowEditMode(false)
     }
     return (
         <div className="container">
@@ -64,10 +68,21 @@ function Home() {
             </div>
             <div className="content">
                 <div className='sidebar'>
-                    <ContactList handleChatClick={handleChatClick} usersListUpdated={usersListUpdated} setUsersListUpdate={setUsersListUpdate}/>                    
+                    <ContactList 
+                    handleChatClick={handleChatClick} 
+                    usersListUpdated={usersListUpdated} 
+                    setUsersListUpdate={setUsersListUpdate}
+                    setChatWindowEditMode={setChatWindowEditMode}
+                    chatWindowEditMode={chatWindowEditMode}
+                    />                    
                 </div>
                 <div className='chat-window'>
-                    <ChatWindow selectedChat={selectedChat} setSelectedChat={setSelectedChat} setUsersListUpdate={setUsersListUpdate}/>
+                    <ChatWindow selectedChat={selectedChat} 
+                    setSelectedChat={setSelectedChat} 
+                    setUsersListUpdate={setUsersListUpdate}
+                    chatWindowEditMode={chatWindowEditMode}
+                    setChatWindowEditMode={setChatWindowEditMode}
+                    />
                 </div>
             </div>
         </div>

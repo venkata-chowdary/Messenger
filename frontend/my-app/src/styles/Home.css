@@ -113,7 +113,7 @@
 
 
 .sidebar {
-    min-width: 25%; /* Adjust sidebar width as needed */
+    min-width: 5%; /* Adjust sidebar width as needed */
     background-color: #2a2a2a;
     overflow-y: auto; /* Enable scrolling if needed */
     position: relative; /* Added to make absolute positioning work within the sidebar */

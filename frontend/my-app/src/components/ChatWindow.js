@@ -4,14 +4,16 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTrashAlt, faEllipsisVertical, faL } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTrashAlt, faEllipsisVertical, faL, faArrowRight, faSmile, faSmileBeam } from '@fortawesome/free-solid-svg-icons';
 import io from 'socket.io-client';
 import ChatWindowEditMode from './ChatWindowEditMode';
+import EmojiPicker from 'emoji-picker-react';
+
 
 const ENDPOINT = 'http://localhost:4000';
 let socket;
 
-function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
+function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChatWindowEditMode, chatWindowEditMode }) {
     const groupIconUrl = 'https://static.vecteezy.com/system/resources/previews/026/019/617/non_2x/group-profile-avatar-icon-default-social-media-forum-profile-photo-vector.jpg';
 
     const { userDetails } = useContext(UserContext);
@@ -26,11 +28,16 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [isChatButtonsVisible, setIsChatButtonsVisible] = useState(false)
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [isCurrentUserAdmin,setIsCurrentUserAdmin]=useState(false)
-    const [isAmdin,setIsAdmin]=useState(false)
-    const dropdownRef = useRef(null);
 
+    const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
+    const dropdownRef = useRef(null);
+    // const [doesCurrentUserHasPreviliges,setDoesCurrentUserHasPreviliges]=useState(false)
+
+    // const [isEditMode, setIsEditMode] = useState(false);
+
+    const [emojiContainer, setEmojiContainer] = useState(false)
+    const emojiRef=useRef(null)
     const config = useMemo(() => ({
         headers: {
             "Content-type": "application/json",
@@ -128,9 +135,8 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
         axios.get(`http://localhost:4000/api/chat/${selectedChat}`, config)
             .then((response) => {
                 const chatData = response.data;
-                console.log(response.data)
+                // console.log(response.data)
                 setChatDetails(chatData);
-
                 if (chatData.isGroupChat) {
                     const otherGroupUsers = chatData.users.filter((user) => user._id !== userDetails._id);
                     // setIsAdmin(chatDetails.groupAdmins.include(userDetails._id))
@@ -141,6 +147,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
                     const otherUser = chatData.users.find((user) => user._id !== userDetails._id);
                     setOtherUserDetails(otherUser);
                 }
+                // console.log(chatDetails.groupAdmins)
 
                 selectedChatCompare.current = chatData._id;
             })
@@ -170,23 +177,25 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
     }
 
     useEffect(() => {
-
-    
         function handleClickOutside(event) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsChatButtonsVisible(false);
+            }
+            if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+                setEmojiContainer(false);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
+
     }, []);
 
 
 
     function handleEditDetails() {
-        setIsEditMode(!isEditMode)
+        setChatWindowEditMode(!chatWindowEditMode)
     }
 
     function handleCancelEdit() {
@@ -196,12 +205,21 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
 
     }
 
+    function handleEmojiBtnClick() {
+        setEmojiContainer(!emojiContainer)
+    }
+
+    function onEmojiClick(emojiData,event){
+        console.log(emojiData)
+        const {emoji}=emojiData
+        setNewMessage(prevMessages=>prevMessages+emoji)
+    }
 
     return (
         <div className="chat-window">
             {selectedChat && chatDetails ? (
-                isEditMode ? (
-                    <ChatWindowEditMode handleCancelEdit={handleCancelEdit} handleSaveEdit={handleSaveEdit} chatDetails={chatDetails} config={config} setChatDetails={setChatDetails} setIsEditMode={setIsEditMode} isEditMode={isEditMode}/>
+                chatWindowEditMode && chatDetails.isGroupChat ? (
+                    <ChatWindowEditMode handleCancelEdit={handleCancelEdit} handleSaveEdit={handleSaveEdit} chatDetails={chatDetails} config={config} setChatDetails={setChatDetails} setIsEditMode={setChatWindowEditMode} isEditMode={chatWindowEditMode} isAdmin={isAdmin} />
                 ) : (
                     <>
                         <div className="chat-header">
@@ -218,7 +236,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
                                     </button>
                                     {isChatButtonsVisible &&
                                         <div className={`chat-menu-btns-list`} ref={dropdownRef}>
-                                            <button className='edit-group-details' onClick={handleEditDetails} disabled={!isAmdin}>
+                                            <button className='edit-group-details' onClick={handleEditDetails}>
                                                 Edit Details
                                             </button>
                                             {/* <button className="delete-button" onClick={handleDelete} title="Delete">
@@ -230,7 +248,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
                                         </div>}
                                 </div>
                             ) : (
-                                <button className="delete-button" title="Delete">
+                                <button className="delete-button" title="Delete" onClick={handleDelete}>
                                     <FontAwesomeIcon icon={faTrashAlt} />
                                 </button>
                             )}
@@ -252,18 +270,39 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate }) {
                             <div ref={messagesEndRef}></div>
                         </div>
                         <div className="chat-input">
-                            <input
-                                type="text"
-                                placeholder="Type your message..."
-                                value={newMessage}
-                                onChange={handleInputChange}
-                                onKeyDown={(e) => {
-                                    if (e.code === "Enter") {
-                                        handleSendMessage();
-                                    }
-                                }}
-                            />
-                            <button onClick={handleSendMessage}>Send</button>
+                            <div className='input-container'>
+                                <div className='emoji-container'>
+                                    <FontAwesomeIcon icon={faSmileBeam} className='emoji-btn' onClick={handleEmojiBtnClick}/>
+                                </div>
+                                {emojiContainer && (
+                                    <div className="emoji-picker" ref={emojiRef}>
+                                        <EmojiPicker
+                                            theme='dark'
+                                            skinTonesDisabled={true}
+                                            className='emojis'
+                                            emojiStyle='google'
+                                            height={320}
+                                            width={'100%'}
+                                            onEmojiClick={onEmojiClick}
+                                        />
+                                    </div>
+                                )}
+                                <input
+                                    className='msg-input'
+                                    type="text"
+                                    placeholder="Type your message..."
+                                    value={newMessage}
+                                    onChange={handleInputChange}
+                                    onKeyDown={(e) => {
+                                        if (e.code === "Enter") {
+                                            handleSendMessage();
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <button onClick={handleSendMessage} className='send-button'>
+                                <FontAwesomeIcon icon={faArrowRight} />
+                            </button>
                         </div>
                     </>
                 )

@@ -8,7 +8,7 @@ import { faPen, faCheck, faArrowLeft, faUserMinus, faUserCheck, faUserEdit, faUs
 import axios from 'axios'
 import { UserContext } from "../context/UserContext";
 
-function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode, isEditMode }) {
+function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode, isEditMode, isAdmin }) {
     const { userDetails } = useContext(UserContext)
     const groupName = chatDetails.chatName
     const groupMembers = chatDetails.users
@@ -69,6 +69,27 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
 
     //Make User admin
     function handleMakeUserAdmin(userId) {
+        setAddLoader(true)
+        const addAdminData = {
+            chatId: chatDetails._id,
+            userId: userId,
+            requestedUserId: userDetails._id
+        }
+        axios.put(`http://localhost:4000/api/chat/group/admin/add`, addAdminData, config)
+            .then((response) => {
+                if (response.status === 200) {
+                    const { message, updatedChat } = response.data;
+                    setTimeout(2000)
+                    setChatDetails(prevData => ({
+                        ...prevData,
+                        groupAdmins: updatedChat.groupAdmins
+                    }));
+                    setAddLoader(false)
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            })
     }
 
     const handleSearchChange = (e) => {
@@ -88,7 +109,7 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
                     }
                     setTimeout(() => {
                         setSearchLoader(false)
-                    },2000)
+                    }, 2000)
                 })
                 .catch(error => {
                     console.error('Error fetching user search results:', error);
@@ -124,7 +145,6 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
                 <FontAwesomeIcon icon={faArrowLeft} />
             </button>
             <div className="edit-chat-form">
-
                 <h3>Edit Group Details</h3>
                 {editMode ? (
                     <div className="group-name-edit-mode edit-mode">
@@ -146,7 +166,7 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
                     </div>
                 )}
             </div>
-            <div className="add-user-group-section">
+            {isAdmin ? <div className="add-user-group-section">
                 <h3>Add members</h3>
                 <div>
                     <input
@@ -160,7 +180,7 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
                     {searchLoader ? (
                         <span className="loader"></span>
                     ) : (
-                        searchResults.length > 0 && (
+                        searchResults.length > 0 ? (
                             <ul>
                                 {searchResults.map(user => (
                                     <li key={user._id} onClick={() => handleUserSelectToAdd(user)}>
@@ -175,9 +195,12 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
                                 ))}
                             </ul>
                         )
-                    )}
+                            :
+                            searchQuery && (
+                                <p>No users found.</p>
+                            ))}
                 </div>
-            </div>
+            </div> : null}
 
             <div className="group-mem-section">
                 <div className="group-mem-section-header">
@@ -198,12 +221,18 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
                                     <span className="admin">Admin</span>
                                 ) : (
                                     <div className="user-control-btns">
-                                        <button className="remove-user-btn" onClick={() => handleRemoveUser(user._id)}>
-                                            <FontAwesomeIcon icon={faUserMinus} />
-                                        </button>
-                                        <button className="make-admin-btn" onClick={() => handleMakeUserAdmin(user._id)}>
-                                            <FontAwesomeIcon icon={faUserTie} />
-                                        </button>
+                                        {console.log(isAdmin)}
+                                        {isAdmin ? <>
+                                            <button className="remove-user-btn" onClick={() => handleRemoveUser(user._id)}>
+                                                <FontAwesomeIcon icon={faUserMinus} />
+                                            </button>
+                                            <button className="make-admin-btn" onClick={() => handleMakeUserAdmin(user._id)}>
+                                                <FontAwesomeIcon icon={faUserTie} />
+                                            </button>
+                                        </>
+                                            :
+                                            null
+                                        }
                                     </div>
                                 )}
                             </div>
@@ -219,4 +248,5 @@ function ChatWindowEditMode({ chatDetails, config, setChatDetails, setIsEditMode
 
 
 export default ChatWindowEditMode
+
 

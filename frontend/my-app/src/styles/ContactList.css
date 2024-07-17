@@ -10,7 +10,6 @@
     /* Subtle shadow on the left */
 }
 
-
 .chats-heading {
     display: flex;
     justify-content: space-between;
@@ -161,9 +160,9 @@
     overflow: hidden;
     position: absolute;
     top: 40px;
-    right: 0;
+    left: -140px;
     background-color: rgba(42, 42, 42, 0.9);
-    /* backdrop-filter: blur(1px); */
+    backdrop-filter: blur(1px);
     border-bottom: 0px solid #007bff;
     transition: max-height 0.3s ease-out, padding 0.3s ease-out, border-bottom 0.3s ease-out;
 }
@@ -175,6 +174,12 @@
     border-radius: 10px;
     z-index: 999;
     border-bottom: 2.5px solid #007bff;
+}
+
+.search-container input{
+    padding: 8px;
+    font-size: 16px;
+    margin-top: 5px;
 }
 
 .search-input {

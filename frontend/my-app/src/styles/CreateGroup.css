@@ -10,8 +10,9 @@
     overflow: hidden;
     position: absolute;
     top: 40px;
-    right: 0;
+    left: -150px;
     background-color: rgba(42, 42, 42, 0.9);
+    backdrop-filter: blur(1px);
     border-bottom: 0px solid #007bff;
     transition: max-height 0.3s ease-out, padding 0.3s ease-out, border-bottom 0.3s ease-out;
     z-index: 999;
@@ -33,7 +34,7 @@
     background-color: #3a3a3a;
     color: white;
     outline: none;
-    font-size: 14px;
+    font-size: 16px;
     transition: border 0.05s;
     border-radius: 10px;
 }

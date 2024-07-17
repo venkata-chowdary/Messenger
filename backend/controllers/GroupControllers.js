@@ -36,10 +36,10 @@ const createGroupChat = (req, res) => {
         })
 }
 
+
 // PUT - /api/chat/group/add-user 
 const addUserstoGroup = (req, res) => {
     const { chatId, newUserIds } = req.body
-
 
     if (!chatId || !newUserIds) {
         return res.status(400).json({ error: "Please fill all the fields." })
@@ -109,7 +109,6 @@ const removeUserFromGroup = (req, res) => {
 //PUT -api/chat/group/rename
 const renameGroup = (req, res) => {
     const { chatId, newGroupName } = req.body
-    console.log('rename')
     if (!chatId || !newGroupName) {
         return res.status(400).json({ error: "Please fill all the fields." })
     }
@@ -127,6 +126,7 @@ const renameGroup = (req, res) => {
 const addAdmin = (req, res) => {
 
     const { chatId, userId, requestedUserId } = req.body
+    console.log('addAdmin')
     if (!chatId || !userId) {
         return res.status(400).json({ error: "Please fill all the fields." })
     }
@@ -151,7 +151,7 @@ const addAdmin = (req, res) => {
             Chat.findByIdAndUpdate(chatId, { $push: { groupAdmins: userId } }, { new: true })
                 .then((updatedChat) => {
                     console.log(updatedChat)
-                    return res.status(200).json({ message: "User added as admin successfully" })
+                    return res.status(200).json({ message: "User added as admin successfully",updatedChat })
                 })
                 .catch((err) => {
                     res.status(500).send({ message: 'Server Error', err })
@@ -174,7 +174,7 @@ const removeAdmin = (req, res) => {
             if (!chatData) {
                 return res.status(404).json({ error: "Chat not found." })
             }
-
+            console.log(chatData)
             //Check wether requested user is already admin or not
             if (!chatData.groupAdmins.includes(requestedUserId)) {
                 return res.status(404).json({ message: "Requested User can't make other user as admin." })
