@@ -4,11 +4,11 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTrashAlt, faEllipsisVertical, faL, faArrowRight, faSmile, faSmileBeam } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTrashAlt, faEllipsisVertical, faL, faArrowRight, faSmile, faSmileBeam, faVideoCamera } from '@fortawesome/free-solid-svg-icons';
 import io from 'socket.io-client';
 import ChatWindowEditMode from './ChatWindowEditMode';
 import EmojiPicker from 'emoji-picker-react';
-
+import VideoChat from './VideoChat';
 
 const ENDPOINT = 'http://localhost:4000';
 let socket;
@@ -28,16 +28,13 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [isChatButtonsVisible, setIsChatButtonsVisible] = useState(false)
-
-    const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false)
     const [isAdmin, setIsAdmin] = useState(false)
     const dropdownRef = useRef(null);
-    // const [doesCurrentUserHasPreviliges,setDoesCurrentUserHasPreviliges]=useState(false)
+    const [isVideoChat, setIsVideoChat] = useState(false);
 
-    // const [isEditMode, setIsEditMode] = useState(false);
 
     const [emojiContainer, setEmojiContainer] = useState(false)
-    const emojiRef=useRef(null)
+    const emojiRef = useRef(null)
     const config = useMemo(() => ({
         headers: {
             "Content-type": "application/json",
@@ -209,17 +206,34 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
         setEmojiContainer(!emojiContainer)
     }
 
-    function onEmojiClick(emojiData,event){
+    function onEmojiClick(emojiData, event) {
         console.log(emojiData)
-        const {emoji}=emojiData
-        setNewMessage(prevMessages=>prevMessages+emoji)
+        const { emoji } = emojiData
+        setNewMessage(prevMessages => prevMessages + emoji)
+    }
+
+    function handleVideoCallBtn() {
+        setIsVideoChat(!isVideoChat)
     }
 
     return (
         <div className="chat-window">
             {selectedChat && chatDetails ? (
                 chatWindowEditMode && chatDetails.isGroupChat ? (
-                    <ChatWindowEditMode handleCancelEdit={handleCancelEdit} handleSaveEdit={handleSaveEdit} chatDetails={chatDetails} config={config} setChatDetails={setChatDetails} setIsEditMode={setChatWindowEditMode} isEditMode={chatWindowEditMode} isAdmin={isAdmin} />
+                    <ChatWindowEditMode
+                        handleCancelEdit={handleCancelEdit}
+                        handleSaveEdit={handleSaveEdit}
+                        chatDetails={chatDetails}
+                        config={config}
+                        setChatDetails={setChatDetails}
+                        setIsEditMode={setChatWindowEditMode}
+                        isEditMode={chatWindowEditMode}
+                        isAdmin={isAdmin} />
+                ) : true ? (
+                    <VideoChat 
+                        chatId={chatDetails._id}
+                        otherUserId={otherUserDetails._id}
+                    />
                 ) : (
                     <>
                         <div className="chat-header">
@@ -248,9 +262,15 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                         </div>}
                                 </div>
                             ) : (
-                                <button className="delete-button" title="Delete" onClick={handleDelete}>
-                                    <FontAwesomeIcon icon={faTrashAlt} />
-                                </button>
+                                <div>
+                                    <button className='video-call-btn' onClick={handleVideoCallBtn}>
+                                        <FontAwesomeIcon icon={faVideoCamera} />
+                                    </button>
+                                    <button className="delete-button" title="Delete" onClick={handleDelete}>
+                                        <FontAwesomeIcon icon={faTrashAlt} />
+                                    </button>
+                                </div>
+
                             )}
                         </div>
                         <div className="chat-messages">
@@ -272,7 +292,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                         <div className="chat-input">
                             <div className='input-container'>
                                 <div className='emoji-container'>
-                                    <FontAwesomeIcon icon={faSmileBeam} className='emoji-btn' onClick={handleEmojiBtnClick}/>
+                                    <FontAwesomeIcon icon={faSmileBeam} className='emoji-btn' onClick={handleEmojiBtnClick} />
                                 </div>
                                 {emojiContainer && (
                                     <div className="emoji-picker" ref={emojiRef}>

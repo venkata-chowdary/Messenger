@@ -74,3 +74,18 @@
                         </div>
                     ))}
                 </div> */}
+
+
+
+                import '../styles/VideoChat.css';
+
+                            {/* <h1>Your ID: {peerId}</h1> */}
+            {/* <div>
+                <input
+                    type="text"
+                    value={remotePeerIdValue}
+                    onChange={(e) => setRemotePeerIdValue(e.target.value)}
+                    placeholder="Enter remote peer ID"
+                />
+                <button onClick={() => call(remotePeerIdValue)}>Call</button>
+            </div> */}

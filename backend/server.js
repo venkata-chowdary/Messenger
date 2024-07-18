@@ -22,7 +22,7 @@ app.use('/api/message', messageRoutes);
 const connectDB = async () => {
     try {
         await mongoose.connect(`mongodb+srv://chowdaryimmanni:s1aMQcASwCHVkwn8@cluster0.mh3yco8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
-        
+
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
@@ -62,7 +62,6 @@ io.on("connection", (socket) => {
     console.log("connected to socket");
 
     socket.on('setupSocket', (userData) => {
-        // console.log(userData.name, userData._id)
         socket.join(userData._id);
         socket.emit('connected')
     })
@@ -77,7 +76,7 @@ io.on("connection", (socket) => {
         socket.to(roomId).emit('typing')
     })
 
-    socket.on("stop typing",(roomId)=>{
+    socket.on("stop typing", (roomId) => {
         socket.to(roomId).emit("stop typing")
     })
 
@@ -92,8 +91,16 @@ io.on("connection", (socket) => {
         })
     })
 
+    socket.emit("me", socket.id)
 
-    socket.off('setup',()=>{
+    socket.on("callUser", (data) => {
+        io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+    })
+
+    socket.on("answerCall", (data) => {
+        io.to(data.to).emit("callAccepted", data.signal)
+    })
+    socket.off('setup', () => {
         console.log("disconnected from socket")
     })
 

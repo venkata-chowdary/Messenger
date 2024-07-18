@@ -174,7 +174,6 @@ const removeAdmin = (req, res) => {
             if (!chatData) {
                 return res.status(404).json({ error: "Chat not found." })
             }
-            console.log(chatData)
             //Check wether requested user is already admin or not
             if (!chatData.groupAdmins.includes(requestedUserId)) {
                 return res.status(404).json({ message: "Requested User can't make other user as admin." })

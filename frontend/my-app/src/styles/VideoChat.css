@@ -1,0 +1,83 @@
+/* VideoChat.css */
+
+.video-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #1c1c1c;
+    color: white;
+    padding: 0;
+    margin: 0;
+}
+
+.video-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #333;
+}
+
+.current-user-video, .remote-user-video {
+    width: 80%;
+    height: 80%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.remote-user-video{
+    background-color: #444;
+}
+.current-user-video {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 250px;
+    height: 150px;
+    border: 2px solid #007bff;
+    background-color: #000;
+}
+
+.bottom-bar {
+    width: 100%;
+    height: 80px;
+    background-color: #1c1c1c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #444;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.controls {
+    display: flex;
+    gap: 20px;
+}
+
+.control-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.control-button:hover {
+    background-color: #555;
+}
+
+.control-button.leave {
+    background-color: #d32f2f;
+}
+
+.control-button.leave:hover {
+    background-color: #b71c1c;
+}
+
+.control-button.muted {
+    background-color: #757575;
+}
