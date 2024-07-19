@@ -7,6 +7,7 @@ import profile from '../assets/profile.jpeg';
 import '../styles/Home.css'; // Import your CSS file for styling
 import ContactList from '../components/ContactList';
 import ChatWindow from '../components/ChatWindow';
+import { VideoChatProvider } from '../context/VideoChatContext';
 
 function Home() {
     const { userDetails, logout } = useContext(UserContext);
@@ -14,7 +15,7 @@ function Home() {
     const [selectedChat, setSelectedChat] = useState(null)
     const [usersListUpdated, setUsersListUpdate] = useState(false)
 
-    const [chatWindowEditMode,setChatWindowEditMode]=useState(false)
+    const [chatWindowEditMode, setChatWindowEditMode] = useState(false)
 
     console.log(userDetails)
     const dropdownRef = useRef(null);
@@ -68,22 +69,25 @@ function Home() {
             </div>
             <div className="content">
                 <div className='sidebar'>
-                    <ContactList 
-                    handleChatClick={handleChatClick} 
-                    usersListUpdated={usersListUpdated} 
-                    setUsersListUpdate={setUsersListUpdate}
-                    setChatWindowEditMode={setChatWindowEditMode}
-                    chatWindowEditMode={chatWindowEditMode}
-                    />                    
-                </div>
-                <div className='chat-window'>
-                    <ChatWindow selectedChat={selectedChat} 
-                    setSelectedChat={setSelectedChat} 
-                    setUsersListUpdate={setUsersListUpdate}
-                    chatWindowEditMode={chatWindowEditMode}
-                    setChatWindowEditMode={setChatWindowEditMode}
+                    <ContactList
+                        handleChatClick={handleChatClick}
+                        usersListUpdated={usersListUpdated}
+                        setUsersListUpdate={setUsersListUpdate}
+                        setChatWindowEditMode={setChatWindowEditMode}
+                        chatWindowEditMode={chatWindowEditMode}
                     />
                 </div>
+                <VideoChatProvider>
+                    <div className='chat-window'>
+                        <ChatWindow selectedChat={selectedChat}
+                            setSelectedChat={setSelectedChat}
+                            setUsersListUpdate={setUsersListUpdate}
+                            chatWindowEditMode={chatWindowEditMode}
+                            setChatWindowEditMode={setChatWindowEditMode}
+                        />
+                    </div>
+                </VideoChatProvider>
+
             </div>
         </div>
     );

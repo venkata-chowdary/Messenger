@@ -1,5 +1,3 @@
-/* VideoChat.css */
-
 .video-chat-container {
     display: flex;
     flex-direction: column;
@@ -19,24 +17,39 @@
     background-color: #333;
 }
 
-.current-user-video, .remote-user-video {
+.remote-user-container {
     width: 80%;
     height: 80%;
-    object-fit: cover;
-    border-radius: 10px;
+    max-width: 700px;
+    max-height: 400px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    background-color: beige;
+
 }
 
-.remote-user-video{
-    background-color: #444;
-}
-.current-user-video {
+.current-user-container {
     position: absolute;
     bottom: 30px;
     right: 30px;
     width: 250px;
     height: 150px;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     border: 2px solid #007bff;
-    background-color: #000;
+    z-index: 1;
+    background-color: red;
+}
+
+.current-user-video,
+.remote-user-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
 }
 
 .bottom-bar {
@@ -47,7 +60,7 @@
     justify-content: center;
     align-items: center;
     border-top: 1px solid #444;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .controls {
@@ -63,7 +76,7 @@
     border-radius: 30px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .control-button:hover {
@@ -80,4 +93,16 @@
 
 .control-button.muted {
     background-color: #757575;
+}
+
+@media (max-width: 768px) {
+    .video-container {
+        flex-direction: column;
+    }
+
+    .current-user-container,
+    .remote-user-container {
+        width: 100%;
+        height: auto;
+    }
 }

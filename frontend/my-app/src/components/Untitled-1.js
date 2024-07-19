@@ -79,13 +79,36 @@
 
                 import '../styles/VideoChat.css';
 
-                            {/* <h1>Your ID: {peerId}</h1> */}
-            {/* <div>
-                <input
-                    type="text"
-                    value={remotePeerIdValue}
-                    onChange={(e) => setRemotePeerIdValue(e.target.value)}
-                    placeholder="Enter remote peer ID"
-                />
-                <button onClick={() => call(remotePeerIdValue)}>Call</button>
-            </div> */}
+                            
+
+                .current-user-container {
+                    width: 80%;
+                    height: 80%;
+                    max-width: 700px;
+                    max-height: 400px;
+                    background-color: #444;
+                    object-fit: cover;
+                    overflow: hidden;
+                    border-radius: 10px;
+                }
+                
+                .current-user-container {
+                    position: absolute;
+                    bottom: 30px;
+                    right: 30px;
+                    max-width: 250px;
+                    max-height: 150px;
+                    border: 2px solid #007bff;
+                    background-color: #000;
+                }
+                
+                .remote-user-video{
+                    max-width: 700px;
+                    max-height: 400px;
+                }
+                /* 
+                .current-user-video{
+                    max-width: 250px;
+                    max-height: 150px;
+                } */
+                

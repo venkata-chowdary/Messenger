@@ -4,11 +4,12 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTrashAlt, faEllipsisVertical, faL, faArrowRight, faSmile, faSmileBeam, faVideoCamera } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTrashAlt, faEllipsisVertical, faL, faArrowRight, faSmile, faSmileBeam, faVideoCamera, faPhone, faPhoneSlash } from '@fortawesome/free-solid-svg-icons';
 import io from 'socket.io-client';
 import ChatWindowEditMode from './ChatWindowEditMode';
 import EmojiPicker from 'emoji-picker-react';
 import VideoChat from './VideoChat';
+import { VideoChatContext } from '../context/VideoChatContext';
 
 const ENDPOINT = 'http://localhost:4000';
 let socket;
@@ -30,8 +31,14 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
     const [isChatButtonsVisible, setIsChatButtonsVisible] = useState(false)
     const [isAdmin, setIsAdmin] = useState(false)
     const dropdownRef = useRef(null);
-    const [isVideoChat, setIsVideoChat] = useState(false);
 
+    const { isVideoChat,
+        setIsVideoChat,
+        call,
+        setCallRinging,
+        receivingCall,
+        acceptIncomingCall
+    } = useContext(VideoChatContext)
 
     const [emojiContainer, setEmojiContainer] = useState(false)
     const emojiRef = useRef(null)
@@ -214,6 +221,12 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
 
     function handleVideoCallBtn() {
         setIsVideoChat(!isVideoChat)
+        setCallRinging(true)
+        call(otherUserDetails._id)
+    }
+
+    function handleAcceptCall() {
+        alert("call accepted")
     }
 
     return (
@@ -229,18 +242,19 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                         setIsEditMode={setChatWindowEditMode}
                         isEditMode={chatWindowEditMode}
                         isAdmin={isAdmin} />
-                ) : true ? (
-                    <VideoChat 
+                ) : isVideoChat ? (
+                    <VideoChat
                         chatId={chatDetails._id}
                         otherUserId={otherUserDetails._id}
+                        setIsVideoChat={setIsVideoChat}
                     />
                 ) : (
                     <>
                         <div className="chat-header">
                             <div className="chat-header-info">
-                                <img src={chatDetails.isGroupChat ? groupIconUrl : chatDetails.users[1].profilePhoto} alt="Profile" className="chat-header-image" />
+                                <img src={chatDetails.isGroupChat ? groupIconUrl : otherUserDetails.profilePhoto} alt="Profile" className="chat-header-image" />
                                 <div className="chat-header-name">
-                                    <h4>{chatDetails.isGroupChat ? chatDetails.chatName : chatDetails.users[1].name}</h4>
+                                    <h4>{chatDetails.isGroupChat ? chatDetails.chatName : otherUserDetails.name}</h4>
                                 </div>
                             </div>
                             {chatDetails.isGroupChat ? (
@@ -259,10 +273,11 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                             <button className="leave-button" title="Leave">
                                                 Leave Group
                                             </button>
-                                        </div>}
+                                        </div>
+                                    }
                                 </div>
                             ) : (
-                                <div>
+                                <div className='header-menu'>
                                     <button className='video-call-btn' onClick={handleVideoCallBtn}>
                                         <FontAwesomeIcon icon={faVideoCamera} />
                                     </button>
@@ -270,7 +285,6 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                         <FontAwesomeIcon icon={faTrashAlt} />
                                     </button>
                                 </div>
-
                             )}
                         </div>
                         <div className="chat-messages">
@@ -324,6 +338,17 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                 <FontAwesomeIcon icon={faArrowRight} />
                             </button>
                         </div>
+                        {receivingCall && <div className='incoming-call-info'>
+                            <p className='caller-name'>Chowdary Immanni</p>
+                            <div className='incoming-call-buttons'>
+                                <button className='answer-call-btn' onClick={handleAcceptCall}>
+                                    <FontAwesomeIcon icon={faPhone} />
+                                </button>
+                                <button className='decline-call-btn' onClick={handleAcceptCall}>
+                                    <FontAwesomeIcon icon={faPhoneSlash} />
+                                </button>
+                            </div>
+                        </div>}
                     </>
                 )
             ) : (
