@@ -11,7 +11,7 @@ export const VideoChatProvider = ({ children }) => {
     const [isVideoOff, setIsVideoOff] = useState(false)
     const [isVideoChat, setIsVideoChat] = useState(false);
     const { userDetails } = useContext(UserContext)
-    const [acceptCall, setAccepetCall] = useState(false)
+    const [acceptCall, setAcceptCall] = useState(false)
     const remoteVideoRef = useRef(null);
     const currentUserVideoRef = useRef(null);
     const peerInstance = useRef(null);
@@ -29,10 +29,11 @@ export const VideoChatProvider = ({ children }) => {
             console.log(peerId)
         });
 
-        peer.on('call',(call)=>{
+        peer.on('call', (call) => {
             setReceivingCall(true)
-
             currentCall.current = call;
+            addCallEndListener(call);
+
         })
 
         peerInstance.current = peer;
@@ -42,6 +43,10 @@ export const VideoChatProvider = ({ children }) => {
             peer.destroy();
         };
     }, [userDetails._id]);
+
+    function addCallEndListener(call) {
+        call.on('close', leaveCall);
+    }
 
     function call(remotePeerId) {
         console.log(remotePeerId)
@@ -60,8 +65,9 @@ export const VideoChatProvider = ({ children }) => {
                         console.error('Error playing remote video:', error);
                     });
                 });
-
                 currentCall.current = call;
+                addCallEndListener(call);
+
             })
             .catch((error) => {
                 console.error('Error calling remote peer:', error);
@@ -69,6 +75,8 @@ export const VideoChatProvider = ({ children }) => {
     };
 
     function acceptIncomingCall() {
+        setAcceptCall(true)
+        setCallRinging(false)
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             .then((mediaStream) => {
                 currentUserVideoRef.current.srcObject = mediaStream;
@@ -84,6 +92,8 @@ export const VideoChatProvider = ({ children }) => {
                 });
                 setIsVideoChat(true);
                 setReceivingCall(false);
+                addCallEndListener(call);
+
             })
             .catch((error) => {
                 console.error('Error getting user media:', error);
@@ -91,43 +101,74 @@ export const VideoChatProvider = ({ children }) => {
     }
 
     function toggleMute() {
-        // const mediaStream = currentUserVideoRef.current.srcObject;
-        // mediaStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
-        // setIsMuted(!isMuted);
-    };
-
-    function leaveCall() {
-        // currentCall.current.close();
-        // currentUserVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
-        // remoteVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
-        // setRemotePeerIdValue('');
-        setIsVideoChat(false)
+        const remoteStreamAudio = currentUserVideoRef.current.srcObject
+        remoteStreamAudio.getAudioTracks().forEach((track) => {
+            track.enabled = !track.enabled
+        })
+        setIsMuted(!isMuted)
     };
 
     function turnOffVideo() {
-        //turnoff video logic
+        const remoteStreamVideo = currentUserVideoRef.current.srcObject
+        remoteStreamVideo.getVideoTracks().forEach((track) => {
+            track.enabled = !track.enabled
+        })
+        setIsVideoOff(!isVideoOff)
     }
 
-    return (
-        <VideoChatContext.Provider value={{
-            isVideoChat,
-            setIsVideoChat,
-            call,
-            leaveCall,
-            toggleMute,
-            turnOffVideo,
-            leaveCall,
-            peerId,
-            setRemotePeerIdValue,
-            remotePeerIdValue,
-            currentUserVideoRef,
-            remoteVideoRef,
-            setCallRinging,
-            setAccepetCall,
-            receivingCall,
-            acceptIncomingCall
-        }}>
-            {children}
-        </VideoChatContext.Provider>
-    );
-};
+    function leaveCall() {
+        if (currentCall.current) {
+            currentCall.current.close();
+        }
+        if (currentUserVideoRef.current && currentUserVideoRef.current.srcObject) {
+            currentUserVideoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        }
+        if (remoteVideoRef.current && remoteVideoRef.current.srcObject) {
+            remoteVideoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        }
+        setRemotePeerIdValue('');
+        setIsVideoChat(false);
+        setCallRinging(false);
+        setAcceptCall(false);
+        setReceivingCall(false);
+
+    };
+
+    function declineCall() {
+        if (currentCall.current) {
+            currentCall.current.close();
+        }
+
+        setCallRinging(false);
+        setReceivingCall(false);
+    }
+
+return (
+    <VideoChatContext.Provider value={{
+        isVideoChat,
+        setIsVideoChat,
+        call,
+        leaveCall,
+        toggleMute,
+        turnOffVideo,
+        leaveCall,
+        peerId,
+        setRemotePeerIdValue,
+        remotePeerIdValue,
+        currentUserVideoRef,
+        remoteVideoRef,
+        setCallRinging,
+        setAcceptCall,
+        receivingCall,
+        acceptIncomingCall,
+        isMuted,
+        turnOffVideo,
+        isVideoOff,
+        declineCall,
+        callRinging
+    }}>
+        {children}
+    </VideoChatContext.Provider>
+);
+
+}

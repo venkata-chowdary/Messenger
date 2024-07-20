@@ -112,3 +112,14 @@
                     max-height: 150px;
                 } */
                 
+                                {/* <div>
+                <h1>{peerId}</h1>
+                <input
+                    type="text"
+                    value={remotePeerIdValue}
+                    onChange={(e) => setRemotePeerIdValue(e.target.value)}
+                    placeholder="Enter remote peer ID"
+                />
+                <p>{remotePeerIdValue}</p>
+                <button onClick={() => call(remotePeerIdValue)}>Call</button>
+            </div> */}

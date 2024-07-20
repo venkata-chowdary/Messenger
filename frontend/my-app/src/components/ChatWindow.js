@@ -37,7 +37,8 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
         call,
         setCallRinging,
         receivingCall,
-        acceptIncomingCall
+        acceptIncomingCall,
+        declineCall
     } = useContext(VideoChatContext)
 
     const [emojiContainer, setEmojiContainer] = useState(false)
@@ -226,7 +227,8 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
     }
 
     function handleAcceptCall() {
-        alert("call accepted")
+        setIsVideoChat(!isVideoChat)
+        acceptIncomingCall()
     }
 
     return (
@@ -245,7 +247,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                 ) : isVideoChat ? (
                     <VideoChat
                         chatId={chatDetails._id}
-                        otherUserId={otherUserDetails._id}
+                        otherUserDetails={otherUserDetails}
                         setIsVideoChat={setIsVideoChat}
                     />
                 ) : (
@@ -344,7 +346,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                 <button className='answer-call-btn' onClick={handleAcceptCall}>
                                     <FontAwesomeIcon icon={faPhone} />
                                 </button>
-                                <button className='decline-call-btn' onClick={handleAcceptCall}>
+                                <button className='decline-call-btn' onClick={declineCall}>
                                     <FontAwesomeIcon icon={faPhoneSlash} />
                                 </button>
                             </div>

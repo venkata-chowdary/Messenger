@@ -175,7 +175,6 @@
     align-items: center;
 }
 
-
 .incoming-call-info {
     display: flex;
     flex-direction: column;
@@ -210,26 +209,32 @@
     padding: 10px;
     border-radius: 50%;
     border: 0;
-    color: #4caf50;
+    color: #d32f2f;
     cursor: pointer;
     font-size: 18px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+.incoming-call-buttons button{
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-.decline-call-btn{
-    color: #d32f2f;
+.answer-call-btn{
+    color: #4caf50;
 }
 
 .answer-call-btn:hover {
     background-color: #4caf50; 
     color: #fff;
-    border: 3px solid red;
 }
 
 .decline-call-btn:hover {
     background-color: #d32f2f; /* Change to red on hover */
-    transform: scale(1.1);
+    color: #fff;
 }
 
 
