@@ -4,7 +4,7 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTrashAlt, faEllipsisVertical, faL, faArrowRight, faSmile, faSmileBeam, faVideoCamera, faPhone, faPhoneSlash } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTrashAlt, faEllipsisVertical, faArrowRight, faSmileBeam, faVideoCamera, faPhone, faPhoneSlash } from '@fortawesome/free-solid-svg-icons';
 import io from 'socket.io-client';
 import ChatWindowEditMode from './ChatWindowEditMode';
 import EmojiPicker from 'emoji-picker-react';
@@ -28,21 +28,24 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
     const [loading, setLoading] = useState(false);
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
-    const [isChatButtonsVisible, setIsChatButtonsVisible] = useState(false)
-    const [isAdmin, setIsAdmin] = useState(false)
+    const [isChatButtonsVisible, setIsChatButtonsVisible] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
     const dropdownRef = useRef(null);
 
-    const { isVideoChat,
+    const { 
+        isVideoChat,
         setIsVideoChat,
         call,
         setCallRinging,
         receivingCall,
         acceptIncomingCall,
-        declineCall
-    } = useContext(VideoChatContext)
+        declineCall,
+        callerData
+    } = useContext(VideoChatContext);
 
-    const [emojiContainer, setEmojiContainer] = useState(false)
-    const emojiRef = useRef(null)
+    const [emojiContainer, setEmojiContainer] = useState(false);
+    const emojiRef = useRef(null);
+
     const config = useMemo(() => ({
         headers: {
             "Content-type": "application/json",
@@ -76,7 +79,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
         socket.on("stop typing", () => { setIsTyping(false); });
 
         socket.on('messageReceived', (newMessageReceived) => {
-            var newMessageId = newMessageReceived.chat._id;
+            const newMessageId = newMessageReceived.chat._id;
             if (selectedChatCompare.current === newMessageId) {
                 console.log("message received");
                 setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
@@ -140,20 +143,15 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
         axios.get(`http://localhost:4000/api/chat/${selectedChat}`, config)
             .then((response) => {
                 const chatData = response.data;
-                // console.log(response.data)
                 setChatDetails(chatData);
                 if (chatData.isGroupChat) {
                     const otherGroupUsers = chatData.users.filter((user) => user._id !== userDetails._id);
-                    // setIsAdmin(chatDetails.groupAdmins.include(userDetails._id))
-                    // console.log(isAmdin)
-                    setIsAdmin(chatData.groupAdmins.includes(userDetails._id))
-                    setOtherUserDetails([otherGroupUsers]);
+                    setIsAdmin(chatData.groupAdmins.includes(userDetails._id));
+                    setOtherUserDetails(otherGroupUsers);
                 } else {
                     const otherUser = chatData.users.find((user) => user._id !== userDetails._id);
                     setOtherUserDetails(otherUser);
                 }
-                // console.log(chatDetails.groupAdmins)
-
                 selectedChatCompare.current = chatData._id;
             })
             .catch((err) => {
@@ -177,8 +175,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
     }, [chatDetails, config]);
 
     function handleChatButtons() {
-        console.log('cliced')
-        setIsChatButtonsVisible(!isChatButtonsVisible)
+        setIsChatButtonsVisible(!isChatButtonsVisible);
     }
 
     useEffect(() => {
@@ -194,41 +191,39 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-
     }, []);
 
-
-
     function handleEditDetails() {
-        setChatWindowEditMode(!chatWindowEditMode)
+        setChatWindowEditMode(!chatWindowEditMode);
     }
 
     function handleCancelEdit() {
-
+        // Implement cancel edit functionality
     }
-    function handleSaveEdit() {
 
+    function handleSaveEdit() {
+        // Implement save edit functionality
     }
 
     function handleEmojiBtnClick() {
-        setEmojiContainer(!emojiContainer)
+        setEmojiContainer(!emojiContainer);
     }
 
     function onEmojiClick(emojiData, event) {
-        console.log(emojiData)
-        const { emoji } = emojiData
-        setNewMessage(prevMessages => prevMessages + emoji)
+        const { emoji } = emojiData;
+        setNewMessage(prevMessages => prevMessages + emoji);
     }
 
     function handleVideoCallBtn() {
-        setIsVideoChat(!isVideoChat)
-        setCallRinging(true)
-        call(otherUserDetails._id)
+        setIsVideoChat(true);
+        setCallRinging(true);
+        call(otherUserDetails._id);
     }
 
     function handleAcceptCall() {
-        setIsVideoChat(!isVideoChat)
-        acceptIncomingCall()
+        setIsVideoChat(true);
+        setCallRinging(false);
+        acceptIncomingCall();
     }
 
     return (
@@ -243,10 +238,10 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                         setChatDetails={setChatDetails}
                         setIsEditMode={setChatWindowEditMode}
                         isEditMode={chatWindowEditMode}
-                        isAdmin={isAdmin} />
+                        isAdmin={isAdmin}
+                    />
                 ) : isVideoChat ? (
                     <VideoChat
-                        chatId={chatDetails._id}
                         otherUserDetails={otherUserDetails}
                         setIsVideoChat={setIsVideoChat}
                     />
@@ -340,17 +335,6 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                 <FontAwesomeIcon icon={faArrowRight} />
                             </button>
                         </div>
-                        {receivingCall && <div className='incoming-call-info'>
-                            <p className='caller-name'>Chowdary Immanni</p>
-                            <div className='incoming-call-buttons'>
-                                <button className='answer-call-btn' onClick={handleAcceptCall}>
-                                    <FontAwesomeIcon icon={faPhone} />
-                                </button>
-                                <button className='decline-call-btn' onClick={declineCall}>
-                                    <FontAwesomeIcon icon={faPhoneSlash} />
-                                </button>
-                            </div>
-                        </div>}
                     </>
                 )
             ) : (
@@ -358,6 +342,19 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                     <div className="logo-container">
                         <img src={logo} alt="logo" className='logo' />
                         <h1>Messenger Web</h1>
+                    </div>
+                </div>
+            )}
+            {receivingCall && (
+                <div className='incoming-call-info'>
+                    <p className='caller-name'>{callerData.name}</p>
+                    <div className='incoming-call-buttons'>
+                        <button className='answer-call-btn' onClick={handleAcceptCall}>
+                            <FontAwesomeIcon icon={faPhone} />
+                        </button>
+                        <button className='decline-call-btn' onClick={declineCall}>
+                            <FontAwesomeIcon icon={faPhoneSlash} />
+                        </button>
                     </div>
                 </div>
             )}

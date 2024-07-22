@@ -208,15 +208,40 @@ const updatePassword = (req, res) => {
         });
 };
 
-const getAllUsers=(req,res)=>{
+const getAllUsers = (req, res) => {
     User.find({})
         .select('-password')
-    .then((allusersData)=>{
-        const otherUsers=allusersData.filter((user)=>{
-            return user._id.toString()!==req.user._id.toString()
+        .then((allusersData) => {
+            const otherUsers = allusersData.filter((user) => {
+                return user._id.toString() !== req.user._id.toString()
             })
-        res.status(200).json({otherUsers})
+            res.status(200).json({ otherUsers })
         })
 }
 
-module.exports = { registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword, getAllUsers,confirmAccount };
+const getUserById = (req, res) => {
+    const { callerId } = req.body
+    console.log(req.body)
+    User.findById(callerId).select('-password')
+        .then((userData) => {
+            res.status(200).json({ userData })
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).json({ message: "Server error" }
+            )
+        })
+}
+module.exports = {
+    registerUser,
+    authUser,
+    allUsers,
+    searchUser,
+    updateUserName,
+    updateProfilePicture,
+    updateAbout,
+    updatePassword,
+    getAllUsers,
+    confirmAccount,
+    getUserById
+};

@@ -1,5 +1,5 @@
 const express = require('express');
-const { confirmAccount,registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword, getAllUsers } = require('../controllers/userControllers');
+const { confirmAccount,registerUser, authUser, allUsers, searchUser, updateUserName, updateProfilePicture, updateAbout, updatePassword, getAllUsers, getUserById } = require('../controllers/userControllers');
 const router = express.Router();
 const { authMiddleware, localVariables } = require('../middleware/authMiddleware');
 const { generateOTP, verifyOTP } = require('../config/OTP');
@@ -17,5 +17,5 @@ router.put('/update-password', authMiddleware, localVariables, updatePassword);
 
 router.get('/generate-otp', authMiddleware, localVariables, generateOTP);
 router.post('/verify-otp', authMiddleware, localVariables, verifyOTP);
-
+router.get('/get-user',authMiddleware,getUserById)
 module.exports = router;
