@@ -1,0 +1,82 @@
+/* CallEndedModal.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: #fff;
+    max-width: 400px;
+    width: 40%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.call-ended-info{
+    display: flex;
+    margin-top: 20px;
+}
+
+.modal-content h2{
+    font-size: 22px;
+    color: #999;
+    font-weight: 500;
+}
+
+
+.call-ended-info div{
+    width: 68px;
+    height: 68px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 4px solid #444;
+    z-index: 1;
+}
+
+.call-ended-info div:last-child{
+    position: relative;
+    margin-left: -30px;
+    z-index: 0;
+}
+.call-ended-info img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.close-btn {
+    font-size: 20px;
+    background-color: transparent;
+    border: 0;
+    padding: 10px;
+    color: #777;
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    cursor: pointer;
+}
+
+.modal-content p{
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+/* .close-button:hover {
+    background: #b71c1c;
+} */

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useRef, useEffect, useContext, useMemo } from 'react';
+import React, { createContext, useState, useRef, useEffect, useContext } from 'react';
 import Peer from 'peerjs';
 import { UserContext } from './UserContext';
 
@@ -16,24 +16,25 @@ export const VideoChatProvider = ({ children }) => {
     const currentUserVideoRef = useRef(null);
     const peerInstance = useRef(null);
     const currentCall = useRef(null);
+    const [callEnded, setCallEnded] = useState(false);
+
     const [callerId, setCallerId] = useState('');
     const [callerData, setCallerData] = useState({});
-    const [callRinging, setCallRinging] = useState(false);
     const [receivingCall, setReceivingCall] = useState(false);
-    const [incomingCall, setIncomingCall] = useState(false)
+    const [isRinging, setIsRinging] = useState(false);
 
+    const [startTime, setStartTime] = useState(null);
+    const [endTime, setEndTime] = useState(null);
+    const [callDuration, setCallDuration] = useState({
+        minutes: null,
+        seconds: null
+    });
 
-    const ringingSound = useRef(new Audio('/path-to-ringing-sound.mp3'));
-
-    const config = useMemo(() => ({
-        headers: {
-            "Content-type": "application/json",
-            'Authorization': 'Bearer ' + userDetails.token,
-        }
-    }), [userDetails.token]);
+    const dataConnection = useRef(null);
 
     useEffect(() => {
         const peer = new Peer(userDetails._id);
+
         peer.on('open', (id) => {
             setPeerId(id);
             setCallerId(id);
@@ -44,6 +45,19 @@ export const VideoChatProvider = ({ children }) => {
             setCallerData(call.metadata);
             currentCall.current = call;
             addCallEndListener(call);
+        });
+
+        peer.on('connection', (conn) => {
+            dataConnection.current = conn;
+
+            conn.on('data', (data) => {
+                if (data.type === 'call-ended') {
+                    const callDuration = data.duration;
+                    const minutes = Math.floor(callDuration / 60);
+                    const seconds =Math.floor(callDuration%60);
+                    setCallDuration({ minutes, seconds });
+                }
+            });
         });
 
         peerInstance.current = peer;
@@ -73,31 +87,41 @@ export const VideoChatProvider = ({ children }) => {
                         console.error('Error playing current user video:', error);
                     });
                 }
-
                 const call = peerInstance.current.call(remotePeerId, mediaStream, { metadata: callerDetails });
+
+                setIsRinging(true);
 
                 call.on('stream', (remoteStream) => {
                     if (remoteVideoRef.current) {
                         remoteVideoRef.current.srcObject = remoteStream;
+                        setIsRinging(false); // Stop ringing animation
                         remoteVideoRef.current.play().catch((error) => {
                             console.error('Error playing remote video:', error);
                         });
                     }
                 });
+
+                call.on('close', () => {
+                    leaveCall();
+                });
+
+                const conn = peerInstance.current.connect(remotePeerId);
+                conn.on('open', () => {
+                    dataConnection.current = conn;
+                });
+
                 currentCall.current = call;
                 addCallEndListener(call);
             })
             .catch((error) => {
                 console.error('Error calling remote peer:', error);
             });
-    };
+    }
 
     function acceptIncomingCall() {
         setAcceptCall(true);
-        setCallRinging(false);
-        setIncomingCall(false)
-        alert(callRinging)
-        ringingSound.current.pause();
+        setStartTime(new Date());
+
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             .then((mediaStream) => {
                 if (currentUserVideoRef.current) {
@@ -132,7 +156,7 @@ export const VideoChatProvider = ({ children }) => {
             });
             setIsMuted(!isMuted);
         }
-    };
+    }
 
     function turnOffVideo() {
         const remoteStreamVideo = currentUserVideoRef.current?.srcObject;
@@ -155,30 +179,33 @@ export const VideoChatProvider = ({ children }) => {
             remoteVideoRef.current.srcObject.getTracks().forEach((track) => track.stop());
         }
 
-        console.log("Call has ended")
-        setTimeout(() => {
-            setIsVideoChat(false);
-            setIncomingCall(false)
-            setCallRinging(false);
-            setAcceptCall(false);
-            setReceivingCall(false);
-        }, 3000)
-        setRemotePeerIdValue('');
+        setIsRinging(false);
         setIsVideoChat(false);
-        setIncomingCall(false)
-        setCallRinging(false);
-        setAcceptCall(false);
         setReceivingCall(false);
-    };
 
-    function declineCall() {
-        if (currentCall.current) {
-            currentCall.current.close();
+        if (startTime) {
+            const endTime = new Date();
+            calculateCallDuration(startTime, endTime);
+
+            // Send call duration to remote user using PeerJS DataConnection
+            const callDuration = (endTime - startTime) / 1000;
+            if (dataConnection.current) {
+                dataConnection.current.send({ type: 'call-ended', duration: callDuration });
+            }
         }
-        ringingSound.current.pause();
+        setCallEnded(true);
+    }
 
-        setCallRinging(false);
-        setReceivingCall(false);
+    function calculateCallDuration(startTime, endTime) {
+        const duration = (endTime - startTime) / 1000;
+        const minutes = Math.floor(duration / 60);
+        const seconds = Math.floor(duration % 60);
+        setCallDuration({ minutes, seconds });
+    }
+
+    function closeCallEndedModal() {
+        setCallEnded(false);
+        setCallDuration({ minutes: null, seconds: null });
     }
 
     return (
@@ -194,19 +221,18 @@ export const VideoChatProvider = ({ children }) => {
             remotePeerIdValue,
             currentUserVideoRef,
             remoteVideoRef,
-            setCallRinging,
             setAcceptCall,
             receivingCall,
             acceptIncomingCall,
             isMuted,
             isVideoOff,
-            declineCall,
-            callRinging,
             callerId,
             callerData,
-            incomingCall,
-            setIncomingCall,
-            acceptCall
+            acceptCall,
+            isRinging,
+            callEnded,
+            closeCallEndedModal,
+            callDuration
         }}>
             {children}
         </VideoChatContext.Provider>

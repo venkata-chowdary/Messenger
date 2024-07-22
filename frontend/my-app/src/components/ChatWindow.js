@@ -10,6 +10,7 @@ import ChatWindowEditMode from './ChatWindowEditMode';
 import EmojiPicker from 'emoji-picker-react';
 import VideoChat from './VideoChat';
 import { VideoChatContext } from '../context/VideoChatContext';
+import CallEndedModal from './CallEndedModal';
 
 const ENDPOINT = 'http://localhost:4000';
 let socket;
@@ -32,15 +33,19 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
     const [isAdmin, setIsAdmin] = useState(false);
     const dropdownRef = useRef(null);
 
-    const { 
+    const {
         isVideoChat,
         setIsVideoChat,
         call,
         setCallRinging,
         receivingCall,
         acceptIncomingCall,
-        declineCall,
-        callerData
+        callerData,
+        setIsRinging,
+        isRinging,
+        callEnded,
+        closeCallEndedModal,
+        callDuration
     } = useContext(VideoChatContext);
 
     const [emojiContainer, setEmojiContainer] = useState(false);
@@ -197,14 +202,6 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
         setChatWindowEditMode(!chatWindowEditMode);
     }
 
-    function handleCancelEdit() {
-        // Implement cancel edit functionality
-    }
-
-    function handleSaveEdit() {
-        // Implement save edit functionality
-    }
-
     function handleEmojiBtnClick() {
         setEmojiContainer(!emojiContainer);
     }
@@ -216,23 +213,26 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
 
     function handleVideoCallBtn() {
         setIsVideoChat(true);
-        setCallRinging(true);
         call(otherUserDetails._id);
     }
 
     function handleAcceptCall() {
         setIsVideoChat(true);
-        setCallRinging(false);
         acceptIncomingCall();
     }
 
     return (
         <div className="chat-window">
+            {callEnded && <CallEndedModal
+                closeCallEndedModal={closeCallEndedModal}
+                currentUserDetails={userDetails}
+                otherUserDetails={otherUserDetails}
+                callDuration={callDuration} />
+            }
+
             {selectedChat && chatDetails ? (
                 chatWindowEditMode && chatDetails.isGroupChat ? (
                     <ChatWindowEditMode
-                        handleCancelEdit={handleCancelEdit}
-                        handleSaveEdit={handleSaveEdit}
                         chatDetails={chatDetails}
                         config={config}
                         setChatDetails={setChatDetails}
@@ -264,9 +264,6 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                             <button className='edit-group-details' onClick={handleEditDetails}>
                                                 Edit Details
                                             </button>
-                                            {/* <button className="delete-button" onClick={handleDelete} title="Delete">
-                                                Delete Chat
-                                            </button> */}
                                             <button className="leave-button" title="Leave">
                                                 Leave Group
                                             </button>
@@ -352,7 +349,7 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                         <button className='answer-call-btn' onClick={handleAcceptCall}>
                             <FontAwesomeIcon icon={faPhone} />
                         </button>
-                        <button className='decline-call-btn' onClick={declineCall}>
+                        <button className='decline-call-btn'>
                             <FontAwesomeIcon icon={faPhoneSlash} />
                         </button>
                     </div>

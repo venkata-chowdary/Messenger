@@ -5,57 +5,54 @@ import { faVolumeXmark, faVolumeHigh, faPhoneSlash, faVideoCamera, faVideoSlash 
 import { VideoChatContext } from '../context/VideoChatContext';
 
 function VideoChat({ otherUserDetails }) {
-    const { 
-        isVideoChat, 
-        remoteVideoRef, 
-        currentUserVideoRef, 
-        leaveCall, 
-        toggleMute, 
-        isMuted, 
-        turnOffVideo, 
-        isVideoOff, 
-        callRinging,
-        incomingCall
+    const {
+        remoteVideoRef,
+        currentUserVideoRef,
+        leaveCall,
+        toggleMute,
+        isMuted,
+        turnOffVideo,
+        isVideoOff,
+        isRinging,
+        isVideoChat
     } = useContext(VideoChatContext);
 
-    console.log(remoteVideoRef)
+
     return (
         <div className="video-chat-container">
             <div className="video-container">
                 <div className='current-user-container'>
                     <video ref={currentUserVideoRef} className="current-user-video" autoPlay muted />
                 </div>
+
                 <div className='remote-user-container'>
-                {console.log("call ringing:",incomingCall)}
-                    {incomingCall  ? (
-                        <div className='ringing-details'>
-                            <div className='ringing-details-container'>
-                                <div className='ringing-profile-outer'>
-                                    <div className='ringing-profile'>
-                                        <img src={otherUserDetails.profilePhoto} className='ringing-profile-photo' alt="Profile" />
-                                    </div>
+                    <video ref={remoteVideoRef} className="remote-user-video" autoPlay />
+                    {isRinging && 
+                    <div className='ringing-details'>
+                        <div className='ringing-details-container'>
+                            <div className='ringing-profile-outer'>
+                                <div className='ringing-profile'>
+                                    <img src={otherUserDetails.profilePhoto} className='ringing-profile-photo' alt="Profile" />
                                 </div>
                             </div>
-                            <p>Ringing....</p>
                         </div>
-                    ) : (
-                        <video ref={remoteVideoRef} className="remote-user-video" autoPlay />
-                    )}
+                        <p>Ringing....</p>
+                    </div>}
                 </div>
             </div>
             <div className="bottom-bar">
                 <div className="controls">
                     <button className={`control-button ${isMuted ? 'muted' : ''}`} onClick={toggleMute}>
-                        {isMuted ? 
+                        {isMuted ?
                             <FontAwesomeIcon icon={faVolumeXmark} />
-                            : 
+                            :
                             <FontAwesomeIcon icon={faVolumeHigh} />
                         }
                     </button>
                     <button className={`control-button`} onClick={turnOffVideo}>
-                        {isVideoOff ? 
+                        {isVideoOff ?
                             <FontAwesomeIcon icon={faVideoSlash} />
-                            : 
+                            :
                             <FontAwesomeIcon icon={faVideoCamera} />
                         }
                     </button>
@@ -68,4 +65,5 @@ function VideoChat({ otherUserDetails }) {
     );
 }
 
-export default VideoChat;
+
+export default VideoChat
