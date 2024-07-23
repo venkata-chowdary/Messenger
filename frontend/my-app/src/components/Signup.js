@@ -1,64 +1,77 @@
 import React, { useContext, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom';
 import AuthPage from '../pages/AuthPage';
-import '../styles/Auth.css'
-import axios from 'axios'
+import '../styles/Auth.css';
+import axios from 'axios';
 import { UserContext } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPen, faCheck, faCamera, faCircleXmark, faCircleCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
-
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { notification } from 'antd'; // Import notification from Ant Design
+
 function Signup() {
     const [name, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
-    const [profilePic, setProfilePic] = useState()
-    const [loading, setLoading] = useState(false)
-    const navigate = useNavigate()
-    const { setUserDetails } = useContext(UserContext)
-    const [passwordError, setPasswordError] = useState('')
+    const [profilePic, setProfilePic] = useState();
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { setUserDetails } = useContext(UserContext);
+    const [passwordError, setPasswordError] = useState('');
 
     const postPhoto = (photo) => {
-        setLoading(true)
+        setLoading(true);
         if (photo === undefined) {
-            console.log('please select an image')
-            return
+            notification.error({
+                message: 'Error',
+                description: 'Please select an image',
+            });
+            setLoading(false);
+            return;
         }
 
         if (photo.type === 'image/jpeg' || photo.type === 'image/png') {
-            const data = new FormData()
-            data.append('file', photo)
-            data.append('upload_preset', 'chat_app')
-            data.append('cloud_name', 'dxdfhiwlt')
+            const data = new FormData();
+            data.append('file', photo);
+            data.append('upload_preset', 'chat_app');
+            data.append('cloud_name', 'dxdfhiwlt');
             axios.post('https://api.cloudinary.com/v1_1/dxdfhiwlt/image/upload', data)
-                .then((res) => { return res.data })
+                .then((res) => res.data)
                 .then((data) => {
-                    console.log(data)
-                    setProfilePic(data.url.toString())
-                    setLoading(false)
+                    setProfilePic(data.url.toString());
+                    setLoading(false);
                 })
                 .catch((err) => {
-                    console.log(err)
-                })
+                    notification.error({
+                        message: 'Upload Failed',
+                        description: 'Failed to upload profile picture. Please try again.',
+                    });
+                    setLoading(false);
+                });
+        } else {
+            notification.error({
+                message: 'Invalid File',
+                description: 'Please select a valid image (JPEG or PNG).',
+            });
         }
-        else {
-            console.log("Please select an image")
-        }
-    }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (!name || !email || !password || !confirmPassword) {
-            setError('Please fill in all fields');
-            console.log(error)
-            return
-        }
-        else if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            console.log(error)
+            notification.error({
+                message: 'Error',
+                description: 'Please fill in all fields',
+            });
+            return;
+        } else if (password !== confirmPassword) {
+            notification.error({
+                message: 'Error',
+                description: 'Passwords do not match',
+            });
             return;
         }
 
@@ -67,22 +80,23 @@ function Signup() {
             return;
         }
 
-        console.log(profilePic)
-
-        axios.post('http://localhost:4000/api/user',
-            { name, password, email, profilePic },
-            { headers: { 'Content-Type': 'application/json' } })
+        axios.post('http://localhost:4000/api/user', { name, password, email, profilePic }, { headers: { 'Content-Type': 'application/json' } })
             .then((response) => {
-                const data = response.data.data
-                console.log(data)
-                setUserDetails(data.data);
-                localStorage.setItem('userInfo', JSON.stringify(data))
-                navigate('/')
+                const data = response.data.data;
+                setUserDetails(data);
+                localStorage.setItem('userInfo', JSON.stringify(data));
+                notification.success({
+                    message: 'Signup Successful',
+                    description: 'You have successfully signed up! Redirecting to the homepage...',
+                });
+                navigate('/');
             })
             .catch((err) => {
-                console.log(err)
-                setError(err)
-            })
+                notification.error({
+                    message: 'Signup Failed',
+                    description: 'Failed to sign up. Please try again.',
+                });
+            });
     };
 
     return (
@@ -135,18 +149,16 @@ function Signup() {
                     )}
                     {error && <p className="error">{error}</p>}
                     <button type="submit">
-                        {loading ?
-                            <span className='profile-loader'></span>
+                        {loading ? 
+                            <span className='profile-loader'></span> 
                             : <p>Signup</p>
                         }
                     </button>
                 </form>
-                <p>Already had an account? <Link to='/login'>Login</Link></p>
+                <p>Already have an account? <Link to='/login'>Login</Link></p>
             </div>
-
         </AuthPage>
     );
 }
-
 
 export default Signup;

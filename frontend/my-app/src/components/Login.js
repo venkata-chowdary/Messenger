@@ -1,49 +1,55 @@
 import React, { useContext, useState } from 'react';
 import AuthPage from '../pages/AuthPage';
-import '../styles/Auth.css'
+import '../styles/Auth.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {UserContext} from '../context/UserContext'
+import { UserContext } from '../context/UserContext';
 import { Link } from 'react-router-dom';
+import { notification } from 'antd'; // Import notification from Ant Design
 
 function Login() {
-
-    const {userDetails,setUserDetails}=useContext(UserContext)
-
+    const { userDetails, setUserDetails } = useContext(UserContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading,setLoading]=useState(false)
-
-    const navigate=useNavigate()
-
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true)
+        setLoading(true);
 
         if (!email || !password) {
-            setError('Please fill in all fields');
-            setLoading(false)
-            return
+            notification.error({
+                message: 'Error',
+                description: 'Please fill in all fields',
+            });
+            setLoading(false);
+            return;
         }
 
-        axios.post('http://localhost:4000/api/user/login',
-            { password, email },
-            { headers: { 'Content-Type': 'application/json' } })
-        .then((response)=>{
-            const data=response.data.data
-            if(data){
-                setUserDetails(data);
-                localStorage.setItem('userInfo',JSON.stringify(data))
-                setLoading(false)
-                navigate('/')
-            }
-        })
-        .catch((err)=>{
-            // setError(err.response.data.message)
-            setLoading(false)
-        })
+        axios.post('http://localhost:4000/api/user/login', { password, email }, { headers: { 'Content-Type': 'application/json' } })
+            .then((response) => {
+                const data = response.data.data;
+                if (data) {
+                    setUserDetails(data);
+                    localStorage.setItem('userInfo', JSON.stringify(data));
+
+                    notification.success({
+                        message: 'Login Successful',
+                        description: 'You have logged in successfully!',
+                    });
+                    setLoading(false);
+                    navigate('/');
+                }
+            })
+            .catch((err) => {
+                notification.error({
+                    message: 'Login Failed',
+                    description: err.response?.data?.message || 'Something went wrong. Please try again.',
+                });
+                setLoading(false);
+            });
     };
 
     return (
@@ -65,7 +71,9 @@ function Login() {
                         placeholder="Password"
                         required
                     />
-                    <button type="submit">Login</button>
+                    <button type="submit">
+                        {loading ? 'Logging in...' : 'Login'}
+                    </button>
                 </form>
                 <p>Don't have an account? <Link to='/signup'>Create an account</Link></p>
             </div>
