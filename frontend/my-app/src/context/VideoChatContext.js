@@ -54,8 +54,12 @@ export const VideoChatProvider = ({ children }) => {
                 if (data.type === 'call-ended') {
                     const callDuration = data.duration;
                     const minutes = Math.floor(callDuration / 60);
-                    const seconds =Math.floor(callDuration%60);
+                    const seconds = Math.floor(callDuration % 60);
                     setCallDuration({ minutes, seconds });
+                }  
+                console.log(data)
+                if (data.type === 'call-declined') {
+                    handleCallDeclined()
                 }
             });
         });
@@ -196,6 +200,30 @@ export const VideoChatProvider = ({ children }) => {
         setCallEnded(true);
     }
 
+    function declineCall() {
+        if (currentCall.current) {
+            currentCall.current.close();
+            currentCall.current = null;
+        }
+    
+        setReceivingCall(false);
+        setCallerData({});
+        setIsRinging(false);
+        setAcceptCall(false);
+    
+        if (dataConnection.current) {
+            dataConnection.current.send({ type: 'call-declined' });
+        }
+    }
+
+    function handleCallDeclined() {
+        setIsRinging(false);
+        setReceivingCall(false);
+        setAcceptCall(false);
+        setCallerData({});
+        // You can also add additional logic here to show a notification to the user
+    }
+
     function calculateCallDuration(startTime, endTime) {
         const duration = (endTime - startTime) / 1000;
         const minutes = Math.floor(duration / 60);
@@ -232,7 +260,8 @@ export const VideoChatProvider = ({ children }) => {
             isRinging,
             callEnded,
             closeCallEndedModal,
-            callDuration
+            callDuration,
+            declineCall
         }}>
             {children}
         </VideoChatContext.Provider>

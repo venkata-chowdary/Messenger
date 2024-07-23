@@ -5,7 +5,7 @@ import { faArrowLeft, faPen, faCheck, faCamera, faCircleXmark, faCircleCheck, fa
 import axios from "axios";
 import { Link } from 'react-router-dom';
 import '../styles/Profile.css';
-
+import { Tooltip } from 'react-tooltip'
 function Profile() {
     const { userDetails, setUserDetails } = useContext(UserContext);
     const [isEditingName, setIsEditingName] = useState(false);
@@ -127,7 +127,7 @@ function Profile() {
 
     const handlePasswordSave = () => {
 
-        if(newPassword=='' || confirmNewPassword=='' || oldPassword==''){
+        if (newPassword == '' || confirmNewPassword == '' || oldPassword == '') {
             setPasswordError('Enter Password')
             setSaveLoading(false)
             return
@@ -234,9 +234,10 @@ function Profile() {
             <div className="profile-header">
                 {passwordSectionActive ? <h2>Change password</h2> :
                     <>
-                        <Link to="/" className="back-button">
+                        <Link to="/" className="back-button" data-tooltip-id='back-tooltip' data-tooltip-content='go home'>
                             <FontAwesomeIcon icon={faArrowLeft} />
                         </Link>
+                        <Tooltip id='back-tooltip' place='bottom-start' style={{zIndex:99}}/>
                         <h2>Profile</h2>
                     </>
                 }
@@ -246,12 +247,14 @@ function Profile() {
                     <div className='profile-details'>
                         <div className="profile-picture">
                             <img src={profilePic} alt="Profile" />
-                            <div className="edit-icon">
+                            <div className="edit-icon" data-tooltip-id='reset-tooltip' data-tooltip-content='change profile picture'>
                                 <label htmlFor="profilePhoto">
                                     <FontAwesomeIcon icon={faCamera} style={{ fontSize: 14 }} />
                                 </label>
                                 <input type="file" name="profilePhoto" id="profilePhoto" accept="image/*" onChange={handleImageChange} />
                             </div>
+                            <Tooltip id='reset-tooltip' place='bottom' style={{ zIndex: 99 }} />
+
                         </div>
                         <div className='profile-info'>
                             <div className='user-info'>
@@ -259,11 +262,12 @@ function Profile() {
                                 {isEditingName ?
                                     <div className='edit-mode'>
                                         <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                                        <button onClick={handleNameSave}><FontAwesomeIcon icon={faCheck} /></button>
+                                        <button onClick={handleNameSave} ><FontAwesomeIcon icon={faCheck} /></button>
                                     </div> :
                                     <div className='view-mode'>
                                         <p className='user-name'>{name}</p>
-                                        <button onClick={handleNameEdit}><FontAwesomeIcon icon={faPen} /></button>
+                                        <button onClick={handleNameEdit} data-tooltip-id='name-tooltip' data-tooltip-content='change name'><FontAwesomeIcon icon={faPen} /></button>
+                                        <Tooltip id='name-tooltip' place='bottom-start' style={{marginTop:-8}}/>
                                     </div>
                                 }
                             </div>
@@ -276,7 +280,8 @@ function Profile() {
                                     </div> :
                                     <div className='view-mode'>
                                         <p>{about}</p>
-                                        <button onClick={handleAboutEdit}><FontAwesomeIcon icon={faPen} /></button>
+                                        <button onClick={handleAboutEdit} data-tooltip-id='about-tooltip' data-tooltip-content='change about'><FontAwesomeIcon icon={faPen} /></button>
+                                        <Tooltip id='about-tooltip' place='bottom-start' style={{marginTop:-8}}/>
                                     </div>
                                 }
                             </div>

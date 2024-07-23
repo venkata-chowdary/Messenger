@@ -159,3 +159,10 @@
         width: 100%; /* Take full width on smaller screens */
     }
 }
+
+.tooltip {
+    padding: 8px 16px;
+    border-radius: 3px;
+    font-size: 90%;
+    width: max-content;
+  }

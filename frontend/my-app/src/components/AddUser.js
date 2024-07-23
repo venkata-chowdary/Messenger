@@ -3,6 +3,8 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useContext, useRef, useState, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
+import { Tooltip as ReactTooltip } from 'react-tooltip'
+
 
 function AddUser({ setUsersListUpdate, handleChatClick }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +51,7 @@ function AddUser({ setUsersListUpdate, handleChatClick }) {
                 console.error('Error creating chat:', err);
             });
     };
-    
+
     const handleAddUserClick = () => {
         setIsVisible(!isVisible);
     };
@@ -69,9 +71,11 @@ function AddUser({ setUsersListUpdate, handleChatClick }) {
 
     return (
         <div className="new-chat" ref={addUserRef}>
-            <button className="newchat-button" onClick={handleAddUserClick}>
+            <button className="newchat-button" onClick={handleAddUserClick} data-tooltip-id="my-tooltip" data-tooltip-content="New Chat">
                 <p>New Chat <FontAwesomeIcon icon={faPlus} /></p>
             </button>
+            <ReactTooltip id='my-tooltip'/>
+
             <div className={`search-container ${isVisible ? 'visible' : ''}`}>
                 {isVisible && (
                     <>

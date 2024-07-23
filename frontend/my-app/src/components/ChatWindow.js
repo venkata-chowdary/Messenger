@@ -11,7 +11,7 @@ import EmojiPicker from 'emoji-picker-react';
 import VideoChat from './VideoChat';
 import { VideoChatContext } from '../context/VideoChatContext';
 import CallEndedModal from './CallEndedModal';
-
+import { Tooltip } from "react-tooltip";
 const ENDPOINT = 'http://localhost:4000';
 let socket;
 
@@ -45,7 +45,8 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
         isRinging,
         callEnded,
         closeCallEndedModal,
-        callDuration
+        callDuration,
+        declineCall
     } = useContext(VideoChatContext);
 
     const [emojiContainer, setEmojiContainer] = useState(false);
@@ -214,11 +215,16 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
     function handleVideoCallBtn() {
         setIsVideoChat(true);
         call(otherUserDetails._id);
+
     }
 
     function handleAcceptCall() {
         setIsVideoChat(true);
         acceptIncomingCall();
+    }
+
+    function handleCallDecline(){
+        declineCall()
     }
 
     return (
@@ -272,12 +278,15 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                 </div>
                             ) : (
                                 <div className='header-menu'>
-                                    <button className='video-call-btn' onClick={handleVideoCallBtn}>
+                                    <button className='video-call-btn' onClick={handleVideoCallBtn} data-tooltip-content='Start Video Chat' data-tooltip-id='tooltip-video-call'>
                                         <FontAwesomeIcon icon={faVideoCamera} />
                                     </button>
-                                    <button className="delete-button" title="Delete" onClick={handleDelete}>
+                                    <Tooltip id='tooltip-video-call' style={{zIndex:99,fontSize:14,padding:10}}/>
+                                    
+                                    <button className="delete-button" title="Delete" onClick={handleDelete} data-tooltip-content='Delete Chat' data-tooltip-id='tooltip-delete'>
                                         <FontAwesomeIcon icon={faTrashAlt} />
                                     </button>
+                                    <Tooltip id='tooltip-delete' place='top' style={{padding:10}}/>
                                 </div>
                             )}
                         </div>
@@ -299,9 +308,10 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                         </div>
                         <div className="chat-input">
                             <div className='input-container'>
-                                <div className='emoji-container'>
-                                    <FontAwesomeIcon icon={faSmileBeam} className='emoji-btn' onClick={handleEmojiBtnClick} />
+                                <div className='emoji-container' data-tooltip-content='emojis' data-tooltip-id='emoji-tooltip'>
+                                    <FontAwesomeIcon icon={faSmileBeam} className='emoji-btn' onClick={handleEmojiBtnClick}/>
                                 </div>
+                                <Tooltip id="emoji-tooltip"/>
                                 {emojiContainer && (
                                     <div className="emoji-picker" ref={emojiRef}>
                                         <EmojiPicker
@@ -328,9 +338,10 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                                     }}
                                 />
                             </div>
-                            <button onClick={handleSendMessage} className='send-button'>
+                            <button onClick={handleSendMessage} className='send-button' data-tooltip-content='send message' data-tooltip-id='send-tooltip'> 
                                 <FontAwesomeIcon icon={faArrowRight} />
                             </button>
+                            <Tooltip id='send-tooltip'/>
                         </div>
                     </>
                 )
@@ -342,14 +353,14 @@ function ChatWindow({ selectedChat, setSelectedChat, setUsersListUpdate, setChat
                     </div>
                 </div>
             )}
-            {receivingCall && (
+            {receivingCall && !isRinging && (
                 <div className='incoming-call-info'>
                     <p className='caller-name'>{callerData.name}</p>
                     <div className='incoming-call-buttons'>
                         <button className='answer-call-btn' onClick={handleAcceptCall}>
                             <FontAwesomeIcon icon={faPhone} />
                         </button>
-                        <button className='decline-call-btn'>
+                        <button className='decline-call-btn' onClick={handleCallDecline}>
                             <FontAwesomeIcon icon={faPhoneSlash} />
                         </button>
                     </div>

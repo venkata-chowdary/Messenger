@@ -4,6 +4,9 @@ import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { UserContext } from '../context/UserContext';
 import '../styles/CreateGroup.css';
+import { Tooltip } from "react-tooltip";
+import '../styles/Home.css'
+
 
 function CreateGroup({ setUsersListUpdate }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -111,11 +114,15 @@ function CreateGroup({ setUsersListUpdate }) {
         }
     };
 
+    
     return (
         <div className="new-group" ref={createGroupRef}>
-            <div className="create-group-btn" onClick={handleCreateGroupClick}>
+
+            <div className="create-group-btn" onClick={handleCreateGroupClick}
+                data-tooltip-content='Create Group' data-tooltip-id="create-group-tooltip">
                 <p>New Group</p>
             </div>
+            <Tooltip id="create-group-tooltip" />
             <div className={`search-container ${isVisible ? 'visible' : ''}`}>
                 {step === 1 && isVisible && (
                     <>

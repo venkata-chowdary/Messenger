@@ -7,7 +7,6 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 function CallEndedModal({ closeCallEndedModal, currentUserDetails, otherUserDetails, callDuration }) {
 
-    console.log(callDuration)
     return (
         <div className="modal-overlay">
             <div className="modal-content">
