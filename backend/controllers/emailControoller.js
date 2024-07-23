@@ -8,6 +8,7 @@ const sendOTP = (to, subject, text) => {
         subject,
         text,
         debug: true,
+        
         logger: true
     };
     transporter.sendMail(mailOptions, (err, info) => {

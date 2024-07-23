@@ -31,9 +31,127 @@ const registerUser = async (req, res) => {
             from: 'your-email@gmail.com',
             to: email,
             subject: 'Account Confirmation',
-            html: `<h1>Welcome to Our App</h1>
-                   <p>Please confirm your account by clicking the link below:</p>
-                   <a href="${url}">Confirm Account</a>`
+            html: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+            @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Lato', Arial, sans-serif;
+                background-color: #fff;
+                color: #fff;
+            }
+
+            .email-confirmation {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                background-color: #1a1a1a;
+            }
+
+            .confirm-container {
+                width: 100%;
+                max-width: 500px;
+                padding: 40px 20px 20px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+                background-color: #333;
+                border-radius: 8px;
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            .confirm-container h1 {
+                font-size: 26px;
+                margin: 20px 0;
+                color: #fff;
+            }
+
+            .confirm-container hr {
+                border: 1px solid #444;
+                width: 80%;
+                margin: 20px auto;
+            }
+
+            .confirm-container .main-name {
+                font-size: 16px;
+                margin: 18px 0;
+                line-height: 1.5;
+            }
+
+            .confirm-container p{
+                margin: 0 0 10px;
+                color:#fff
+            }
+
+            .confirm-container p span {
+                color: #007bff;
+                font-weight: 600;
+            }
+
+            .confirm-container a.confirm-button {
+                display: inline-block;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 6px;
+                font-size: 16px;
+                background-color: #007bff;
+                color: #fff;
+                text-decoration: none;
+                transition: background-color 0.3s ease;
+                font-weight: bold;
+                margin: 20px auto 5px;
+            }
+
+            .confirm-container a.confirm-button:hover {
+                background-color: #0056b3;
+            }
+
+            .confirm-container .footer {
+                margin-top: 40px;
+                font-size: 14px;
+            }
+            
+            .footer p{
+                color: #888;
+
+            }
+
+            .confirm-container .footer a {
+                color: #007bff;
+                text-decoration: none;
+            }
+
+            .confirm-container .footer a:hover {
+                text-decoration: underline;
+            }
+        </style>
+            </head>
+            <body>
+                <div class="email-confirmation">
+                    <div class="confirm-container">
+                        <h1>Welcome to Our App!</h1>
+                        <hr />
+                        <p class="main-name">Hello <span>${user.name}</span>,</p>
+                        <p>Thank you for registering with us.</p>
+                        <p>To complete your registration and activate your account, please confirm your email address by clicking the button below:</p>
+                        <a href="${url}" class="confirm-button">Confirm Account</a>
+        
+                        <div class="footer">
+                            <p>Need assistance? <a href="mailto:support@yourapp.com">Contact Support</a></p>
+                            <p>&copy; ${new Date().getFullYear()} Our App. All rights reserved.</p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            `
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
@@ -73,7 +191,7 @@ const confirmAccount = async (req, res) => {
 
         user.isConfirmed = true; // Add an `isConfirmed` field to your User model
         await user.save();
-
+        res.redirect('http://localhost:3000/account-confirmed'); // Adjust URL according to your client setup
         return res.status(200).json({ message: 'Account confirmed successfully' });
     } catch (error) {
         return res.status(400).json({ message: 'Error confirming account' });

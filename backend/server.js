@@ -46,7 +46,6 @@ app.get('/api/chat/:id', (req, res) => {
 
 app.use(notFound);
 app.use(errorHandler);
-
 const server = app.listen(4000, () => {
     console.log(`Server running on 4000`);
 });
