@@ -14,10 +14,7 @@ function ConfirmMail() {
                     <p>Thanks for singing up to <span>Messenger</span></p>
                     <p>We're happy to have you.</p>
                 </div>
-                <p>Confirmed? 
-                <Link>
-                    Sign in here
-                </Link></p>
+                <p>Confirmed?<Link to='/login'> Sign in here</Link></p>
             </div>
 
         </div>

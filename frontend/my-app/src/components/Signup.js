@@ -89,7 +89,7 @@ function Signup() {
                     message: 'Signup Successful',
                     description: 'You have successfully signed up! Redirecting to the homepage...',
                 });
-                navigate('/');
+                navigate('/confirm-mail');
             })
             .catch((err) => {
                 notification.error({

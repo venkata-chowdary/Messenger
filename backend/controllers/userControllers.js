@@ -192,7 +192,7 @@ const confirmAccount = async (req, res) => {
         user.isConfirmed = true; // Add an `isConfirmed` field to your User model
         await user.save();
         res.redirect('http://localhost:3000/account-confirmed'); // Adjust URL according to your client setup
-        return res.status(200).json({ message: 'Account confirmed successfully' });
+        // return res.status(200).json({ message: 'Account confirmed successfully' });
     } catch (error) {
         return res.status(400).json({ message: 'Error confirming account' });
     }
@@ -200,28 +200,42 @@ const confirmAccount = async (req, res) => {
 
 
 const authUser = async (req, res) => {
-    const { email, password } = req.body
-    const user = await User.findOne({ email })
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        console.log(user)
+        if(!user.isConfirmed){
+            return res.status(401).json({ message: 'Please confirm your account' });
+        }
+        
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-        return res.status(201).json({
-            message: 'User logged in successfully',
-            data: {
-                name: user.name,
-                _id: user._id,
-                email: user.email,
-                about: user.about,
-                profilePhoto: user.profilePhoto,
-                token: generateToken(user._id)
-            }
-        });
-    }
-    else {
-        res.status(401).json({ message: 'Invalid email or password' });
-    }
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
+        console.log(`Password match: ${isPasswordCorrect}`); // Debugging statement
+
+        if (isPasswordCorrect) {
+            return res.status(200).json({
+                message: 'User logged in successfully',
+                data: {
+                    name: user.name,
+                    _id: user._id,
+                    email: user.email,
+                    about: user.about,
+                    profilePhoto: user.profilePhoto,
+                    token: generateToken(user._id)
+                }
+            });
+        } else {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
 };
-
 // get- /api/user
 const allUsers = async (req, res) => {
     User.find({
